@@ -4,73 +4,99 @@
 #@File:examperiment_pub.py
 __author__ = "liuAmon"
 import os
+import time
 import numpy as np
 import pandas as pd
 from logger import logger
 from utils.handlerLoss import MSE
 from sklearn import preprocessing
+from utils.base_impute import random_inpute
+from auto_encoder import interpolation_mask
 from utils.handlerMissData import geneMissData
+from utils.base_tools import get_mask,get_miss_location
 from fancyimpute import KNN, NuclearNormMinimization, SoftImpute, IterativeImputer, BiScaler,SimpleFill
-from iris_buldModel import get_miss_location,interpolation
+
 if __name__=="__main__":
-    for file in os.listdir('public_data'):
-        for miss_rate in range(1, 10):
-            miss_rate = miss_rate / 10
-            try:
-                if file.endswith('xlsx'):
-                    iris = pd.read_excel('public_data/{}'.format(file), sheet_name="dataset")
-                    dt = np.array(iris.values)
-                    iris = dt.astype('float')
-                    # #归一化，去掉标签
-                    min_max_scaler = preprocessing.MinMaxScaler()
-                    iris = min_max_scaler.fit_transform(iris[:, :-1])
-                    x_test_alldata, miss_mask = geneMissData(miss_rate, iris)
-                    miss_location = get_miss_location(x_test_alldata[miss_mask])
-                    modelName = file + '_{}'.format(miss_rate)
-                    inp = interpolation(modelName=modelName, completeData=np.delete(iris, miss_mask, axis=0))
-                    if not os.path.exists('Model/{}.pkl'.format(modelName)):
-                        inp.fit()
-                    pred_data, fix_data = inp.prd(x_test_alldata[miss_mask])
-                    beforeRevise = MSE(pred_data, iris[miss_mask])
-                    afterRevise = MSE(fix_data, iris[miss_mask])
+    start=time.time()
 
-                    logger.info("{}--before revise:{}".format(modelName, beforeRevise))
-                    logger.info("{}--after revise:{}".format(modelName, afterRevise))
-                    logger.info("{}--propose MSE increase:{}".format(modelName, beforeRevise - afterRevise))
-                    X_filled_knn = KNN(k=3).fit_transform(x_test_alldata)
-                    X_filled_knn_revised = inp.revise(X_filled_knn[miss_mask], miss_location)
-                    logger.info("{}--knn:{}".format(modelName, MSE(X_filled_knn[miss_mask], iris[miss_mask])))
-                    logger.info("{}--knn--revised:{}".format(modelName, MSE(X_filled_knn_revised, iris[miss_mask])))
-                    logger.info("{}--knn--improved:{}".format(modelName,
-                                                                       MSE(X_filled_knn[miss_mask], iris[miss_mask]) - MSE(
-                                                                           X_filled_knn_revised, iris[miss_mask])))
+    # #归一化，去掉标签
+    path = r'public_data/'
+    fileSavePath = r'G:\labWork\imputed_experiment_data\fix'
+    # file='AhyongOM04crabs'
 
-                    X_filled_ii = IterativeImputer().fit_transform(x_test_alldata)
-                    X_filled_ii_revised = inp.revise(X_filled_ii[miss_mask], miss_location)
-                    logger.info("{}--iterativeImputer:{}".format(modelName, MSE(X_filled_ii[miss_mask], iris[miss_mask])))
-                    logger.info(
-                        "{}--iterativeImputer--revised:{}".format(modelName, MSE(X_filled_ii_revised, iris[miss_mask])))
-                    logger.info("{}--iterativeImputer--improve:{}".format(modelName, MSE(X_filled_ii[miss_mask],
-                                                                                                  iris[miss_mask]) - MSE(
-                        X_filled_ii_revised, iris[miss_mask])))
-                    X_filled_sf = SimpleFill().fit_transform(x_test_alldata)
-                    logger.info("{}--SimpleFillmean:{}".format(modelName, MSE(X_filled_sf[miss_mask], iris[miss_mask])))
-                    X_filled_sf_revised = inp.revise(X_filled_sf[miss_mask], miss_location)
-                    logger.info(
-                        "{}--SimpleFillmean--revised:{}".format(modelName, MSE(X_filled_sf_revised, iris[miss_mask])))
-                    logger.info(
-                        "{}--SimpleFillmean--improved:{}".format(modelName, MSE(X_filled_sf[miss_mask],
-                                                                                         iris[miss_mask]) - MSE(
-                            X_filled_sf_revised, iris[miss_mask])))
+    modelSavePath = r'G:\labWork\imputed_experiment_data\model'
+    for file in os.listdir(path):
+        logger.info("**********************{}********************".format(file))
+        data = pd.read_excel(os.path.join(path,file), sheet_name="dataset")
+        dt = np.array(data.values)
+        data = dt.astype('float')
+        data=data[:-1]
+        target=data[-1]
+        for i in [0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
 
-                    X_filled_md = SimpleFill("median").fit_transform(x_test_alldata)
-                    logger.info("{}--SimpleFillmedian:{}".format(modelName, MSE(X_filled_md[miss_mask], iris[miss_mask])))
-                    X_filled_md_revised = inp.revise(X_filled_sf[miss_mask], miss_location)
-                    logger.info(
-                        "{}--SimpleFillmedian--revised:{}".format(modelName, MSE(X_filled_md_revised, iris[miss_mask])))
-                    logger.info(
-                        "{}--SimpleFillmedian--improved:{}".format(modelName, MSE(X_filled_md[miss_mask],
-                                                                                           iris[miss_mask]) - MSE(
-                            X_filled_md_revised, iris[miss_mask])))
-            except Exception as e:
-                logger.error(e)
+            miss_data = geneMissData(rate=i, data=data)
+
+            mask = get_mask(miss_data)
+            miss_location = get_miss_location(miss_data)
+            # 数据均值化
+            # min_max_scaler = preprocessing.MinMaxScaler()
+            # mm_miss_data = min_max_scaler.fit_transform(miss_data)
+            min_max_scaler = preprocessing.StandardScaler()
+            mm_miss_data = min_max_scaler.fit_transform(miss_data)
+            modelName = file + str(i)
+            inp = interpolation_mask(modelName=modelName, completeData=random_inpute(mm_miss_data))
+            if not os.path.exists(os.path.join(modelSavePath, '{}.pkl'.format(modelName))):
+                inp.fit(os.path.join(modelSavePath, '{}.pkl'.format(modelName)), mask)
+
+            # pred_data, fix_data = inp.prd(mm_miss_data, model=os.path.join(modelSavePath, '{}.pkl'.format(modelName)))
+            #
+            # fix_auto_data = min_max_scaler.inverse_transform(fix_data)
+            #
+            # pred_data = min_max_scaler.inverse_transform(pred_data)
+            # # saveData(fileSavePath, '{}_{}_auto.tnt'.format(file, str(i / 2)), speciesname, fix_auto_data, begin, end)
+            # # logger.info("{}============".format(i))
+            # # logger.info("number of charater :{}".format(len(s)))
+            # logger.info("初步插补 MSE:{}".format(MSE(data, pred_data)))
+            # logger.info("ae MSE:{}".format(MSE(data,fix_auto_data)))
+            # logger.info("res change MSE:{}".format(MSE(pred_data, fix_auto_data)))
+
+
+            X_filled_knn = KNN(k=3).fit_transform(mm_miss_data)
+            re_X = inp.revise(X_filled_knn, miss_location,
+                              model=os.path.join(modelSavePath, '{}.pkl'.format(modelName)))
+            X_filled_knn = min_max_scaler.inverse_transform(X_filled_knn)
+            re_X = min_max_scaler.inverse_transform(re_X)
+            logger.info("knn MSE:{}".format(MSE(data, X_filled_knn)))
+            logger.info("knn res MSE:{}".format(MSE(data, re_X)))
+            logger.info("res change MSE:{}".format(MSE(X_filled_knn, re_X)))
+            # X_filled_ii = IterativeImputer().fit_transform(mm_miss_data)
+            # re_X = inp.revise(X_filled_ii, miss_location,
+            #                   model=os.path.join(modelSavePath, '{}.pkl'.format(modelName)))
+            # X_filled_ii = restore(min_max_scaler=min_max_scaler,s=s,data=X_filled_ii)
+            # re_X = restore(min_max_scaler=min_max_scaler, s=s, data=re_X)
+            # logger.info("ii MSE:{}".format(MSE(imputed_data, X_filled_ii)))
+            # logger.info("ii res MSE:{}".format(MSE(imputed_data,  re_X)))
+
+            X_filled_sf = SimpleFill().fit_transform(mm_miss_data)
+            re_X = inp.revise(X_filled_sf, miss_location,
+                              model=os.path.join(modelSavePath, '{}.pkl'.format(modelName)))
+            X_filled_sf = min_max_scaler.inverse_transform(X_filled_sf)
+            re_X = min_max_scaler.inverse_transform(re_X)
+            logger.info("sf MSE:{}".format(MSE(data, X_filled_sf)))
+            logger.info("sf res MSE:{}".format(MSE(data, re_X)))
+            logger.info("res change MSE:{}".format(MSE(X_filled_sf, re_X)))
+            X_filled_me = SimpleFill("median").fit_transform(miss_data)
+            re_X = inp.revise(X_filled_me, miss_location,
+                              model=os.path.join(modelSavePath, '{}.pkl'.format(modelName)))
+            X_filled_me = min_max_scaler.inverse_transform(X_filled_me)
+            re_X = min_max_scaler.inverse_transform(re_X)
+            logger.info("median MSE:{}".format(MSE(data, X_filled_me)))
+            logger.info("median res MSE:{}".format(MSE(data,re_X)))
+            logger.info("res change MSE:{}".format(MSE(X_filled_me, re_X)))
+
+            # result[e]=temp
+        # logger.info(result)
+
+        logger.info(" missing rate is {}".format(i))
+
+        break

@@ -129,15 +129,7 @@ class interpolation():
                     inputs.grad.zero_()
             fixNum[num] = inputs.data.cpu().numpy()
         return fixNum
-def get_miss_location(missData):
-    miss_location=[]
-    for i in missData:
-        temp = []
-        for index, j in enumerate(i):
-            if np.isnan(j):
-                temp.append(index)
-        miss_location.append(temp)
-    return miss_location
+
 from auto_encoder import *
 if __name__=="__main__":
     start=time.time()
