@@ -1,13 +1,13 @@
 from sklearn import preprocessing
 import os
-from utils.readFile import *
+from utils.read_file import *
 from utils.random_impute import *
 from logger import logger
-from utils.handlerLoss import *
-from utils.handlerMissData import *
+from utils.handler_loss import *
+from utils.handle_missingdata import *
 import os
 import torch
-from utils.handlerLoss import *
+from utils.handler_loss import *
 import numpy as np
 import pandas as pd
 import torch.nn as nn
@@ -21,12 +21,12 @@ from utils import kdtree
 from fancyimpute import KNN, NuclearNormMinimization, SoftImpute, IterativeImputer, BiScaler,SimpleFill
 from logger import logger
 from Config import baseInfo as bi
-from utils.handlerLoss import MSE
+from utils.handler_loss import MSE
 from sklearn import preprocessing
 from torch.autograd import Variable
 from utils.kmeans import KMeansBase
-from utils.readFile import readNex
-from utils.handlerMissData import *
+from utils.read_file import readNex
+from utils.handle_missingdata import *
 from autoEncoder_pytorch import get_mask,get_miss_location
 class Encoder(torch.nn.Module):
     def __init__(self,D_in,D_out):
@@ -206,7 +206,7 @@ if __name__=="__main__":
 
     logger.info("**********************{}********************".format(file))
     for  i in [0.05,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]:
-        miss_data= geneMissData(rate=i, data=imputed_data)
+        miss_data= gene_missingdata(rate=i, data=imputed_data)
 
         logger.info("{}============".format(i))
         logger.info("random MSE:{}".format(MSE(imputed_data,random_inpute(miss_data))))

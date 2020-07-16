@@ -9,18 +9,18 @@ import numpy as np
 import pandas as pd
 from utils import kdtree
 from logger import logger
-from utils.handlerLoss import MSE
+from utils.handler_loss import MSE
 from sklearn import preprocessing
 from Config import baseInfo as bi
 from utils.kmeans import KMeansBase
-from utils.handlerMissData import geneMissData
+from utils.handle_missingdata import gene_missingdata
 from sklearn.model_selection import train_test_split
 from autoEncoder_pytorch import AE,Encoder,Decoder
 
 
 
 def test(number,data):
-    x_test_alldata, x_test_complete, x_test_miss, x_test_miss_data_true = geneMissData(0.2, data)
+    x_test_alldata, x_test_complete, x_test_miss, x_test_miss_data_true = gene_missingdata(0.2, data)
     km = KMeansBase(3, distanceType="euclidean")
     labels = km.fit_predict(x_test_complete)
     print(km.centers)

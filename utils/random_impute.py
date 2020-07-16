@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import random
-from utils.readFile import readNex,saveData
+from utils.read_file import readNex,saveData
 def random_inpute(data):
     '''
         :param data: 含有缺失数据集

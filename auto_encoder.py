@@ -13,7 +13,7 @@ from fancyimpute import KNN, NuclearNormMinimization, SoftImpute, IterativeImput
 from logger import logger
 from Config import baseInfo as bi
 
-from utils.handlerMissData import *
+from utils.handle_missingdata import *
 from torch.utils import data
 
 class MyDataset(data.Dataset):

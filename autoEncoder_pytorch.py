@@ -7,8 +7,8 @@ import os
 import torch
 from utils.random_impute import *
 from auto_encoder import *
-from utils.readFile import readNex
-from utils.handlerMissData import *
+from utils.read_file import readNex
+from utils.handle_missingdata import *
 device=torch.device(bi['core'])
 
 
@@ -39,7 +39,7 @@ if __name__=="__main__":
                 for e in range(5):
                     # logger.info(" missing rate is {}".format(i))
                     # logger.info("epoch is {}".format(e))
-                    miss_data= geneMissData(rate=i, data=imputed_data)
+                    miss_data= gene_missingdata(rate=i, data=imputed_data)
 
                     # logger.info("{}============".format(i))
                     # logger.info("random MSE:{}".format(MSE(imputed_data,random_inpute(miss_data))))

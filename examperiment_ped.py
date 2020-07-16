@@ -7,8 +7,8 @@ __author__ = "liuAmon"
 import os
 import numpy as np
 from sklearn import preprocessing
-from utils.handlerMissData import geneMissData
-from utils.readFile import readNex,saveData
+from utils.handle_missingdata import gene_missingdata
+from utils.read_file import readNex,saveData
 from fancyimpute import KNN, NuclearNormMinimization, SoftImpute, IterativeImputer, BiScaler,SimpleFill
 from logger import logger
 from iris_buldModel import get_miss_location,interpolation
@@ -42,7 +42,7 @@ if __name__=="__main__":
                 # file='Liu2011'
                 # origin_data,miss_mask,speciesName=readNex(r'C:\Users\pro\Desktop\all_nex_data\{}.nex'.format(file))
                     origin_data, miss_mask, speciesName,begin,end = readNex(os.path.join(filePath,'{}.tnt'.format(file)))
-                    miss_data, miss_mask = geneMissData(rate=i, data=origin_data)
+                    miss_data, miss_mask = gene_missingdata(rate=i, data=origin_data)
 
 
 

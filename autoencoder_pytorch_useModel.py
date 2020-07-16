@@ -6,7 +6,7 @@ __author__ = "liuAmon"
 import torch
 import pandas as pd
 from sklearn import preprocessing
-from utils.handlerMissData import geneMissData
+from utils.handle_missingdata import gene_missingdata
 from autoEncoder_pytorch import AE,Encoder,Decoder
 
 device=torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -21,7 +21,7 @@ iris = dt.astype('double')
 # 归一化，去掉标签
 min_max_scaler = preprocessing.MinMaxScaler()
 iris = min_max_scaler.fit_transform(iris[31:50, :-1])
-iris_miss=geneMissData(0.2,iris)
+iris_miss=gene_missingdata(0.2,iris)
 
 criterion=torch.nn.MSELoss()
 inputs=torch.ones(1,4,requires_grad=True,device=device)

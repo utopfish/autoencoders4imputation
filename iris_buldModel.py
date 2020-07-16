@@ -8,7 +8,7 @@ from utils import kdtree
 from utils.random_impute import *
 from sklearn import preprocessing
 from fancyimpute import KNN, NuclearNormMinimization, SoftImpute, IterativeImputer, BiScaler,SimpleFill
-from utils.handlerLoss import MSE
+from utils.handler_loss import MSE
 
 class interpolation():
     def __init__(self,feature_length=None,h_length=None,modelName=None,completeData=None):
@@ -152,7 +152,7 @@ if __name__=="__main__":
             for e in range(5):
                 # logger.info(" missing rate is {}".format(i))
                 # logger.info("epoch is {}".format(e))
-                miss_data = geneMissData(rate=i, data=data)
+                miss_data = gene_missingdata(rate=i, data=data)
 
                 # logger.info("{}============".format(i))
                 # logger.info("random MSE:{}".format(MSE(imputed_data,random_inpute(miss_data))))

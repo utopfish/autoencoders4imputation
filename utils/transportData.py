@@ -8,7 +8,7 @@ __author__ = "liuAmon"
 '''
 import os
 from collections import Counter
-from utils.readFile import readNex
+from utils.read_file import readNex
 def count(str):
     '''
     算（）是否相同
