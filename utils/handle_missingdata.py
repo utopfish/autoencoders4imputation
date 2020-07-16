@@ -29,6 +29,24 @@ def gene_missingdata(rate,data,seed=0):
             miss_data[row][col]=np.nan
             count+=1
     return miss_data
+def gene_missingdata_df(rate,data,seed=0):
+    '''
+    :param rate: 缺失率，int
+    :param data: 完整数据集，df
+    随机模式缺失
+    :return:缺失后数据集和缺失行数
+    '''
+    # random.seed=seed
+    count=0
+    miss_data=data.copy()
+    nrow,ncol=miss_data.shape
+    while count<rate*nrow*ncol:
+        row=int(random.random()*nrow)
+        col=int(random.random()*ncol)
+        if miss_data.iloc[row,col]!=np.nan:
+            miss_data.iloc[row,col]=np.nan
+            count+=1
+    return miss_data
 def readDataAndSplit(path):
     csvdata = pd.read_excel(path,header=None)
     dt = csvdata.values
