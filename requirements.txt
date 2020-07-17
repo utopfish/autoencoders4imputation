@@ -12,3 +12,4 @@ matplotlib
 fancyimpute
 torch
 torchvision
+impyute==0.0.8

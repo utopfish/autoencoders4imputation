@@ -8,6 +8,7 @@ import torch
 from utils.random_impute import *
 from auto_encoder import *
 from utils.read_file import readNex
+from utils.base_tools import *
 from utils.handle_missingdata import *
 device=torch.device(bi['core'])
 

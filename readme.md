@@ -18,3 +18,7 @@ tnt建树
 1. 在pycharm中使用缺失插补方法，对缺失数据集进行处理
 2. 在tnt中建树，比较不同建树结果与论文树的RF，co distance距离
 3. 在R中使用treespace，画出不同树的MSD散点图，比较不同建树结果与论文树的treeVec,nNodes距离。
+
+实验记录：  
+2020-07-17  
+knn明显耗时最长，em算法在iris,wine上效果比随机插补还差，mice和ii算法在许多数据集上都表现出最好的效果。
