@@ -5,7 +5,7 @@
 import numpy as np
 from pandas import isnull
 
-from ..utils.normalizer import NORMALIZERS,RECOVER
+from utils.normalizer import NORMALIZERS,RECOVER
 
 
 

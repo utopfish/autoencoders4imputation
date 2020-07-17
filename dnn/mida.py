@@ -57,9 +57,12 @@ class MIDA(Solver):
                 cost.backward()
                 optimizer.step()
                 if self.verbose:
-                    if (i + 1) % (total_batch // 2) == 0:
-                        print('Epoch [%d/%d], lter [%d/%d], Loss: %.6f' %
-                              (epoch + 1, self.epochs, i + 1, total_batch, cost.item()))
+                    try:
+                        if (i + 1) % (total_batch // 2) == 0:
+                            print('Epoch [%d/%d], lter [%d/%d], Loss: %.6f' %
+                                  (epoch + 1, self.epochs, i + 1, total_batch, cost.item()))
+                    except Exception as e:
+                        pass
 
                 # early stopping rule 1 : MSE < 1e-06
                 if cost.item() < 1e-06:

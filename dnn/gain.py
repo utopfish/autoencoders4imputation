@@ -76,9 +76,12 @@ class GAIN(Solver):
         optimG = torch.optim.RMSprop(netG.parameters(), lr=self.lr)
 
         train_dset = SimpleDataLoader(training_data,train_mask)
+        # train_loder = DataLoader(train_dset,
+        #                          batch_size=self.batch_size,
+        #                          num_workers=1)
         train_loder = DataLoader(train_dset,
                                  batch_size=self.batch_size,
-                                 num_workers=1)
+                                 )
         bce_loss = torch.nn.BCEWithLogitsLoss(reduction="elementwise_mean")
         mse_loss = torch.nn.MSELoss(reduction="elementwise_mean")
 
