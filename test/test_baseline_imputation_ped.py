@@ -167,7 +167,7 @@ for file in os.listdir(path):
     plt.plot(x, random_rmse, color=color[9], label='random')
     plt.plot(x, mode_rmse, color=color[11], label='mode')
     plt.plot(x, mida_rmse, color=color[13], linewidth=3.0, linestyle='-.', label='mida')
-    plt.plot(x, mida_rmse, color=color[14], linewidth=3.0, linestyle='-.', label='gain')
+    plt.plot(x, gain_rmse, color=color[14], linewidth=3.0, linestyle='-.', label='gain')
     plt.title("rmse of different missing rate in {}".format(file))
     plt.legend(loc="upper left")
     # plt.show()
