@@ -1,7 +1,7 @@
 """
 @author: liuAmon
 @contact:utopfish@163.com
-@file: test_gain.py
+@file: test_dnn.py
 @time: 2020/7/16 17:06
 """
 import numpy as np
@@ -125,25 +125,62 @@ def test_mida():
     score = evaluate.RMSE(complete_data_[missing_mask],
                  X_filled[missing_mask])
     print(score)
-from ycimpute.imputer import knnimput,iterforest
+import pandas as pd
+from logger import logger
+from matplotlib import pyplot as plt
+from utils.handle_missingdata import gene_missingdata
 if __name__=="__main__":
-    from datasets import load_data
-    iris_miss,iris_ori=load_data.load_iris()
-    X_filled = MIDA().complete(iris_miss)
-    # X_filled = GAIN().complete(iris_miss)
-    #X_filled =iterforest.MissForest().complete(iris_miss)
-    # complete_data_, _, _ = min_max_scale(iris_ori)
-    # X_filled, _, _ = min_max_scale(X_filled)
-    #
-    # score = evaluate.RMSE(complete_data_,
-    #                       X_filled)
-    import pandas as pd
-    from utils.handle_missingdata import gene_missingdata
-    path = r'../public_data/1_Iris.xlsx'
-    data = pd.read_excel(path, sheet_name="dataset")
-    dt = np.array(data.values)
-    data = dt.astype('float')
-    origin_data = data[:, :-1]
-    target = data[:, -1]
-    miss_data = gene_missingdata(rate=0.1, data=origin_data)
-    print("ss")
+    path = r'../public_data/'
+    pciturePath = r'G:\labWork\imputation_plt\pub'
+    for file in os.listdir(path):
+        logger.info("**********************{}********************".format(file))
+        data = pd.read_excel(os.path.join(path, file), sheet_name="dataset")
+        dt = np.array(data.values)
+        data = dt.astype('float')
+        origin_data = data[:, :-1]
+        target = data[:, -1]
+        knn_rmse = []
+        mice_rmse = []
+        em_rmse = []
+        fi_knn_rmse = []
+        fi_bs_rmse = []
+        fi_si_rmse = []
+        fi_ii_rmse = []
+        fi_sf_rmse = []
+        fi_median_rmse = []
+        random_rmse = []
+        mean_rmse = []
+        mode_rmse = []
+        median_rmse = []
+        mida_rmse = []
+        gain_rmse = []
+        for i in [0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
+            miss_data = gene_missingdata(rate=i, data=origin_data)
+
+            try:
+                imputed_data = MIDA().complete(miss_data)
+                score = evaluate.RMSE(origin_data, imputed_data)
+                logger.info("MIDA missing rate:{},RMSE:{}".format(i, score))
+                mida_rmse.append(score)
+            except:
+                mida_rmse.append(np.nan)
+
+            try:
+                imputed_data = GAIN().complete(miss_data)
+                score = evaluate.RMSE(origin_data, imputed_data)
+                logger.info("GAIN missing rate:{},RMSE:{}".format(i, score))
+                gain_rmse.append(score)
+            except:
+                gain_rmse.append(np.nan)
+        color = ['blue', 'green', 'red', 'yellow', 'black', 'burlywood', 'cadetblue', 'chartreuse', 'purple',
+                 'coral',
+                 'aqua', 'aquamarine', 'darkblue', 'y', 'm']
+
+        plt.figure()
+        x = [0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+        plt.plot(x, mida_rmse, color=color[13], linewidth=3.0, linestyle='-.', label='mida')
+        plt.plot(x, gain_rmse, color=color[14], linewidth=3.0, linestyle='-.', label='gain')
+        plt.title("rmse of different missing rate in {}".format(file))
+        plt.legend(loc="upper left")
+        # plt.show()
+        plt.savefig(os.path.join(pciturePath, "dnn_rmse_of_different_missing_rate_in_{}.png".format(file)))
