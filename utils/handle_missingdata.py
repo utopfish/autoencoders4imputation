@@ -36,7 +36,7 @@ def gene_missingdata_df(rate,data,seed=0):
     随机模式缺失
     :return:缺失后数据集和缺失行数
     '''
-    # random.seed=seed
+    random.seed=seed
     count=0
     miss_data=data.copy()
     nrow,ncol=miss_data.shape

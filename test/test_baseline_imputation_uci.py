@@ -15,7 +15,7 @@ from matplotlib import pyplot as plt
 from utils.handle_missingdata import gene_missingdata
 from dnn.mida import MIDA
 from dnn.gain import GAIN
-from ycimpute.imputer import knnimput, mice, EM, GAIN
+from ycimpute.imputer import knnimput, mice, EM
 from fancyimpute import KNN, NuclearNormMinimization, SoftImpute, IterativeImputer, BiScaler, SimpleFill
 
 path = r'../public_data/'
