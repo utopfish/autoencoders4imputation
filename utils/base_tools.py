@@ -35,6 +35,7 @@ def modifier (data,unqiue):
         for j in range(len(data[0])):
                 t = np.argmin(np.abs(unqiue-data[i][j]))
                 data[i][j] = unqiue[t]
+    return data
 def restore(min_max_scaler,s,data):
     '''
     数据数据反归一化，对插补的数据获取标准插补值，并转为int型

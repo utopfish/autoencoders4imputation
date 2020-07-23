@@ -44,17 +44,17 @@ for i in [0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
     # imputed_data=iterforest.MissForest().complete(miss_data)
     # score = evaluate.RMSE(origin_data, imputed_data)
     # logger.info("iterforest missing rate:{},RMSE:{}".format(i, score))
-
     #MIDA has bug ZeroDivisionError: integer division or modulo by zero
     imputed_data=MIDA().complete(miss_data)
     score = evaluate.RMSE(origin_data, imputed_data)
     logger.info("MIDA missing rate:{},RMSE:{}".format(i, score))
     mida_rmse.append(score)
+
     #RuntimeError: DataLoader worker (pid(s) 8180) exited unexpectedly
-    imputed_data=GAIN().complete(miss_data)
-    score = evaluate.RMSE(origin_data, imputed_data)
-    logger.info("GAIN missing rate:{},RMSE:{}".format(i, score))
-    gain_rmse.append(score)
+    # imputed_data=GAIN().complete(miss_data)
+    # score = evaluate.RMSE(origin_data, imputed_data)
+    # logger.info("GAIN missing rate:{},RMSE:{}".format(i, score))
+    # gain_rmse.append(score)
 color=['blue','green','red','yellow','black','burlywood','cadetblue','chartreuse','chocolate','coral']
 
 plt.figure()
