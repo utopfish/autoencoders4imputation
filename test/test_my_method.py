@@ -29,7 +29,7 @@ for file in os.listdir(path):
     origin_data = data[:, :-1]
     target = data[:, -1]
 
-    for miss_pat in ['taxa','chara','block']:
+    for miss_pat in ['normal','taxa','chara','block']:
         mice_rmse = []
         ii_rmse = []
         median_rmse = []
@@ -133,9 +133,9 @@ for file in os.listdir(path):
         plt.plot(x, random_rmse, color=color[9], linestyle=':', label='random')
         # plt.plot(x, mida_rmse, color=color[13], linewidth=3.0, linestyle='-.', label='mida')
         # plt.plot(x, gain_rmse, color=color[14], linewidth=3.0, linestyle='-.', label='gain')
-        plt.plot(x, tai_ii_rmse, color=color[10], linewidth=3.0, linestyle='-', label='tai ii')
-        plt.plot(x, tai_mice_rmse, color=color[12], linewidth=3.0, linestyle='-', label='tai mice')
-        plt.plot(x, tai_random_rmse, color=color[0], linewidth=3.0, linestyle='-', label='tai random')
+        plt.plot(x, tai_ii_rmse, color=color[10], linewidth=2.0, linestyle='-', label='tai ii')
+        plt.plot(x, tai_mice_rmse, color=color[12], linewidth=2.0, linestyle='-', label='tai mice')
+        plt.plot(x, tai_random_rmse, color=color[0], linewidth=2.0, linestyle='-', label='tai random')
         plt.title("rmse of different missing rate in {}_{}".format(file, miss_pat))
         plt.legend(loc="upper left")
         # plt.show()

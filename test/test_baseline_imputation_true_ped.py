@@ -42,7 +42,9 @@ for file in os.listdir(path):
         random_rmse = []
         mida_rmse = []
         gain_rmse = []
-        tai_rmse=[]
+        tai_ii_rmse=[]
+        tai_mice_rmse = []
+        tai_random_rmse = []
         for i in [0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
             if miss_pat=='normal':
                 miss_data = gene_missingdata(rate=i, data=origin_data)
@@ -105,14 +107,45 @@ for file in os.listdir(path):
                 gain_rmse.append(score)
             except:
                 gain_rmse.append(np.nan)
+
+
             try:
-                imputed_data = TAI().complete(miss_data)
+                imputed_data,first_imputed_data = TAI().complete(miss_data)
                 imputed_data = modifier(imputed_data, mark)
                 score = evaluate.RMSE(origin_data, imputed_data)
-                logger.info("TAI missing rate:{},RMSE:{}".format(i, score))
-                tai_rmse.append(score)
+
+                first_imputed_data= modifier(first_imputed_data, mark)
+                score1 = evaluate.RMSE(origin_data, first_imputed_data)
+                logger.info("TAI ii first missing rate:{},RMSE:{}".format(i, score1))
+                logger.info("TAI ii missing rate:{},RMSE:{}".format(i, score))
+
+                tai_ii_rmse.append(score)
+            except Exception as e :
+                print(e)
+                tai_ii_rmse.append(np.nan)
+            try:
+                imputed_data , first_imputed_data= TAI(first_imputation_method='mice').complete(miss_data)
+                score = evaluate.RMSE(origin_data, imputed_data)
+                imputed_data = modifier(imputed_data, mark)
+
+                first_imputed_data = modifier(first_imputed_data, mark)
+                score1 = evaluate.RMSE(origin_data, first_imputed_data)
+                logger.info("TAI mice first missing rate:{},RMSE:{}".format(i, score1))
+                logger.info("TAI mice missing rate:{},RMSE:{}".format(i, score))
+                tai_mice_rmse.append(score)
             except:
-                tai_rmse.append(np.nan)
+                tai_mice_rmse.append(np.nan)
+            try:
+                imputed_data , first_imputed_data= TAI(first_imputation_method='random').complete(miss_data)
+                score = evaluate.RMSE(origin_data, imputed_data)
+                imputed_data = modifier(imputed_data, mark)
+                first_imputed_data = modifier(first_imputed_data, mark)
+                score1 = evaluate.RMSE(origin_data, first_imputed_data)
+                logger.info("TAI random first missing rate:{},RMSE:{}".format(i, score1))
+                logger.info("TAI random missing rate:{},RMSE:{}".format(i, score))
+                tai_random_rmse.append(score)
+            except:
+                tai_random_rmse.append(np.nan)
         color = ['blue', 'green', 'red', 'yellow', 'black', 'burlywood', 'cadetblue', 'chartreuse', 'purple', 'coral',
                  'aqua', 'aquamarine', 'darkblue', 'y','m']
 
@@ -120,12 +153,13 @@ for file in os.listdir(path):
         x = [0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
         plt.plot(x, mice_rmse, color=color[1], label='mice')
         plt.plot(x, ii_rmse, color=color[2], label='ii')
-        plt.plot(x, median_rmse, color=color[3], linestyle=':',label='median')
-        plt.plot(x, random_rmse, color=color[9], linestyle=':',label='random')
-        plt.plot(x, mida_rmse, color=color[13], linewidth=3.0,linestyle='-.',label='mida')
-        plt.plot(x, gain_rmse, color=color[14], linewidth=3.0, linestyle='-.', label='gain')
-        plt.plot(x, tai_rmse, color=color[10], linewidth=3.0, linestyle='-', label='tai')
-        plt.title("rmse of different missing rate in {}_{}".format(file,miss_pat))
-        plt.legend(loc="upper left")
+        plt.plot(x, median_rmse, color=color[3], linestyle=':', label='median')
+        plt.plot(x, random_rmse, color=color[9], linestyle=':', label='random')
+        # plt.plot(x, mida_rmse, color=color[13], linewidth=3.0, linestyle='-.', label='mida')
+        # plt.plot(x, gain_rmse, color=color[14], linewidth=3.0, linestyle='-.', label='gain')
+        plt.plot(x, tai_ii_rmse, color=color[10], linewidth=2.0, linestyle='-', label='tai ii')
+        plt.plot(x, tai_mice_rmse, color=color[12], linewidth=2.0, linestyle='-', label='tai mice')
+        plt.plot(x, tai_random_rmse, color=color[0], linewidth=2.0, linestyle='-', label='tai random')
+        plt.title("rmse of different missing rate in {}_{}".format(file, miss_pat))
         # plt.show()
         plt.savefig(os.path.join(pciturePath, "rmse_of_different_missing_rate_in_{}_{}.png".format(file,miss_pat)))
