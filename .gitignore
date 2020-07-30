@@ -1,0 +1,14 @@
+/.idea
+/MNIST_data
+/MNIST
+/dirtyWork
+/ped_data
+/public_data
+/test_data
+/datasets
+/logs
+/Model
+/noploy_data
+/__pycache__
+/.pytest_cache
+/.ipynb_checkpoints

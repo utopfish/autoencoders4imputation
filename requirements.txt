@@ -11,5 +11,6 @@ easydict
 matplotlib
 fancyimpute
 torch
+ycimpute
 torchvision
 impyute==0.0.8
