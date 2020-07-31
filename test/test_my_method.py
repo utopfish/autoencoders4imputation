@@ -50,34 +50,34 @@ for file in os.listdir(path):
                 miss_data=gene_missingdata_block_bias(rate=i, data=origin_data)
             else:
                 raise Exception("缺失模式错误，请在'normal','taxa','chara','block'中选择对应模式")
-            try:
-                imputed_data = mice.MICE().complete(miss_data)
-                score = evaluate.RMSE(origin_data, imputed_data)
-                mice_rmse.append(score)
-                logger.info("MICE missing rate:{},RMSE:{}".format(i, score))
-            except:
-                mice_rmse.append(np.nan)
-            try:
-                imputed_data = IterativeImputer().fit_transform(miss_data)
-                score = evaluate.RMSE(origin_data, imputed_data)
-                ii_rmse.append(score)
-                logger.info("fi IterativeImputer missing rate:{},RMSE:{}".format(i, score))
-            except:
-                ii_rmse.append(np.nan)
-            try:
-                imputed_data = SimpleFill("median").fit_transform(miss_data)
-                score = evaluate.RMSE(origin_data, imputed_data)
-                median_rmse.append(score)
-                logger.info("fi median missing rate:{},RMSE:{}".format(i, score))
-            except:
-                median_rmse.append(np.nan)
-            try:
-                imputed_data = impyute.imputation.cs.random(miss_data)
-                score = evaluate.RMSE(origin_data, imputed_data)
-                random_rmse.append(score)
-                logger.info("random missing rate:{},RMSE:{}".format(i, score))
-            except:
-                random_rmse.append(np.nan)
+            # try:
+            #     imputed_data = mice.MICE().complete(miss_data)
+            #     score = evaluate.RMSE(origin_data, imputed_data)
+            #     mice_rmse.append(score)
+            #     logger.info("MICE missing rate:{},RMSE:{}".format(i, score))
+            # except:
+            #     mice_rmse.append(np.nan)
+            # try:
+            #     imputed_data = IterativeImputer().fit_transform(miss_data)
+            #     score = evaluate.RMSE(origin_data, imputed_data)
+            #     ii_rmse.append(score)
+            #     logger.info("fi IterativeImputer missing rate:{},RMSE:{}".format(i, score))
+            # except:
+            #     ii_rmse.append(np.nan)
+            # try:
+            #     imputed_data = SimpleFill("median").fit_transform(miss_data)
+            #     score = evaluate.RMSE(origin_data, imputed_data)
+            #     median_rmse.append(score)
+            #     logger.info("fi median missing rate:{},RMSE:{}".format(i, score))
+            # except:
+            #     median_rmse.append(np.nan)
+            # try:
+            #     imputed_data = impyute.imputation.cs.random(miss_data)
+            #     score = evaluate.RMSE(origin_data, imputed_data)
+            #     random_rmse.append(score)
+            #     logger.info("random missing rate:{},RMSE:{}".format(i, score))
+            # except:
+            #     random_rmse.append(np.nan)
             # try:
             #     imputed_data = MIDA().complete(miss_data)
             #     score = evaluate.RMSE(origin_data, imputed_data)
@@ -104,24 +104,24 @@ for file in os.listdir(path):
             except Exception as e :
                 print(e)
                 tai_ii_rmse.append(np.nan)
-            try:
-                imputed_data , first_imputed_data= TAI(first_imputation_method='mice').complete(miss_data)
-                score = evaluate.RMSE(origin_data, imputed_data)
-                score1 = evaluate.RMSE(origin_data, first_imputed_data)
-                logger.info("TAI mice first missing rate:{},RMSE:{}".format(i, score1))
-                logger.info("TAI mice missing rate:{},RMSE:{}".format(i, score))
-                tai_mice_rmse.append(score)
-            except:
-                tai_mice_rmse.append(np.nan)
-            try:
-                imputed_data , first_imputed_data= TAI(first_imputation_method='random').complete(miss_data)
-                score = evaluate.RMSE(origin_data, imputed_data)
-                score1 = evaluate.RMSE(origin_data, first_imputed_data)
-                logger.info("TAI random first missing rate:{},RMSE:{}".format(i, score1))
-                logger.info("TAI random missing rate:{},RMSE:{}".format(i, score))
-                tai_random_rmse.append(score)
-            except:
-                tai_random_rmse.append(np.nan)
+            # try:
+            #     imputed_data , first_imputed_data= TAI(first_imputation_method='mice').complete(miss_data)
+            #     score = evaluate.RMSE(origin_data, imputed_data)
+            #     score1 = evaluate.RMSE(origin_data, first_imputed_data)
+            #     logger.info("TAI mice first missing rate:{},RMSE:{}".format(i, score1))
+            #     logger.info("TAI mice missing rate:{},RMSE:{}".format(i, score))
+            #     tai_mice_rmse.append(score)
+            # except:
+            #     tai_mice_rmse.append(np.nan)
+            # try:
+            #     imputed_data , first_imputed_data= TAI(first_imputation_method='random').complete(miss_data)
+            #     score = evaluate.RMSE(origin_data, imputed_data)
+            #     score1 = evaluate.RMSE(origin_data, first_imputed_data)
+            #     logger.info("TAI random first missing rate:{},RMSE:{}".format(i, score1))
+            #     logger.info("TAI random missing rate:{},RMSE:{}".format(i, score))
+            #     tai_random_rmse.append(score)
+            # except:
+            #     tai_random_rmse.append(np.nan)
 
         color = ['blue', 'green', 'red', 'yellow', 'black', 'burlywood', 'cadetblue', 'chartreuse', 'purple', 'coral',
                  'aqua', 'aquamarine', 'darkblue', 'y','m']
