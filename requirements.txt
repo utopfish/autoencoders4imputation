@@ -12,5 +12,6 @@ matplotlib
 fancyimpute
 torch
 ycimpute
+ray
 torchvision
 impyute==0.0.8
