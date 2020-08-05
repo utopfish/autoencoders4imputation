@@ -63,6 +63,33 @@ def log_weight_prob(x, alpha, mu, cov):
     N = x.shape[0]
     return np.mat(np.log(alpha) + log_prob(x, mu, cov)).reshape([N, 1])
 
+def RMSE(y_true, y_pred):
+    '''
+    Mean squared error
+    '''
+    return np.sqrt(np.mean((y_true - y_pred) ** 2))
+
+
+def MAE(y_true, y_pred):
+    '''
+    Mean absolute error
+    '''
+    return np.mean(np.abs(y_true - y_pred))
+def masked_mape_np(y_true, y_pred, null_val=0):
+    '''
+    MAPE
+    '''
+    with np.errstate(divide='ignore', invalid='ignore'):
+        if np.isnan(null_val):
+            mask = ~np.isnan(y_true)
+        else:
+            mask = np.not_equal(y_true, null_val)
+        mask = mask.astype('float32')
+        mask /= np.mean(mask)
+        mape = np.abs(np.divide((y_pred - y_true).astype('float32'), y_true))
+        mape = np.nan_to_num(mask * mape)
+        return np.mean(mape) * 100
+
 if __name__=="__main__":
     li1=np.array([1,2,3,4])
     li2=np.array([1,3,4,5])
