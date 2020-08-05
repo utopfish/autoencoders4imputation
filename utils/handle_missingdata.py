@@ -19,7 +19,7 @@ def gene_missingdata(rate,data,seed=0):
     随机模式缺失
     :return:缺失后数据集和缺失行数
     '''
-    random.seed=seed
+    #random.seed=seed
     miss_data=data.copy()
     nrow, ncol = miss_data.shape
     myList = list(np.linspace(0, ncol*nrow-1, ncol*nrow, dtype=int))
@@ -30,7 +30,7 @@ def gene_missingdata(rate,data,seed=0):
         miss_data[row][col] = np.nan
     return miss_data
 def gene_missingdata_taxa_bias(rate,data,seed=0):
-    random.seed=seed
+    #random.seed=seed
     miss_data=data.copy()
     nrow, ncol = miss_data.shape
     choice_row=random.sample(list(np.linspace(0, nrow-1, nrow, dtype=int)),int(nrow*rate))
