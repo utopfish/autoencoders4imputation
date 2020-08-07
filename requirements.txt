@@ -12,6 +12,6 @@ matplotlib
 fancyimpute
 torch
 ycimpute
-ray
+prettytable
 torchvision
 impyute==0.0.8
