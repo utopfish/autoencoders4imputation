@@ -25,14 +25,14 @@ from sklearn.datasets import load_boston
 path = r'../public_data/'
 pciturePath = r'E:\labCode\picture_save\3_misc'
 for file in os.listdir(path):
-    logger.info("**********************{}********************".format(file))
-    data = pd.read_excel(os.path.join(path, file), sheet_name="dataset")
-    dt = np.array(data.values)
-    data = dt.astype('float')
-    origin_data = data[:, :-1]
-    target = data[:, -1]
-    # file = "boston"
-    # origin_data, target = load_boston(return_X_y=True)
+    # logger.info("**********************{}********************".format(file))
+    # data = pd.read_excel(os.path.join(path, file), sheet_name="dataset")
+    # dt = np.array(data.values)
+    # data = dt.astype('float')
+    # origin_data = data[:, :-1]
+    # target = data[:, -1]
+    file = "boston"
+    origin_data, target = load_boston(return_X_y=True)
     # for miss_pat in ['normal','taxa','chara','block']:
     for miss_pat in ['normal', 'block', 'taxa', 'chara']:
         mice_misc = [[] for _ in range(3)]
@@ -46,7 +46,7 @@ for file in os.listdir(path):
         tai_random_misc = [[] for _ in range(3)]
         tai_none_misc = [[] for _ in range(3)]
         tresai_mice_misc = [[] for _ in range(3)]
-        tresai_ii_misc = [[] for _ in range(4)]
+        tresai_ii_misc = [[] for _ in range(3)]
         for i in [0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
             if miss_pat == 'normal':
                 miss_data = gene_missingdata(rate=i, data=origin_data)

@@ -78,6 +78,89 @@ def readTreeSpecies(path,speciesName):
                 i=i.replace(j,'{}'.format(ind))
             i=i.replace(',',' ')
             print(i)
+def read_result_log(path,save_path):
+    '''
+    读取方法实验结果
+    :param path str:
+    :return:
+    '''
+    with open(path) as file_obj:
+        content = file_obj.read()
+        resu=[]
+        temp={}
+
+        for i in content.split("\n"):
+            if "271 -" in i :
+                temp['name']=i.split("271 - file:")[1].split("\n")[0].replace("*","")
+            if "272 -" in i:
+                temp['pattern']=i.split("272 - pattern :")[1].split("\n")[0]
+            if "273 -" in i:
+                temp['rate']=i.split("273 - ")[1].split("\n")[0]
+            if "277 -" in i:
+                temp['mice']=["".join(filter(lambda ch: ch in '0123456789.',j)) for j in i.split(" - ")[1].split("\n")[0].split(',') ]
+            if "279 -" in i:
+                temp['median']=["".join(filter(lambda ch: ch in '0123456789.',j)) for j in i.split(" - ")[1].split("\n")[0].split(',') ]
+            if "281 -" in i:
+                temp['random']=["".join(filter(lambda ch: ch in '0123456789.',j)) for j in i.split(" - ")[1].split("\n")[0].split(',') ]
+            if "283 -" in i:
+                temp['mida']=["".join(filter(lambda ch: ch in '0123456789.',j)) for j in i.split(" - ")[1].split("\n")[0].split(',') ]
+            if "285 -" in i:
+                temp['gain']=["".join(filter(lambda ch: ch in '0123456789.',j)) for j in i.split(" - ")[1].split("\n")[0].split(',') ]
+            if "287 -" in i:
+                temp['tai_mice']=["".join(filter(lambda ch: ch in '0123456789.',j)) for j in i.split(" - ")[1].split("\n")[0].split(',') ]
+            if "290 -" in i:
+                temp['tresai_mice']=["".join(filter(lambda ch: ch in '0123456789.',j)) for j in i.split(" - ")[1].split("\n")[0].split(',') ]
+            if "292 -" in i:
+                temp['tresai_ii']=["".join(filter(lambda ch: ch in '0123456789.',j)) for j in i.split(" - ")[1].split("\n")[0].split(',') ]
+
+            if "297 -" in i:
+                temp['mice_all']=["".join(filter(lambda ch: ch in '0123456789.',j)) for j in i.split(" - ")[1].split("\n")[0].split(',') ]
+            if "299 -" in i:
+                temp['ii_all']=["".join(filter(lambda ch: ch in '0123456789.',j)) for j in i.split(" - ")[1].split("\n")[0].split(',') ]
+            if "301 -" in i:
+                temp['median_all']=["".join(filter(lambda ch: ch in '0123456789.',j)) for j in i.split(" - ")[1].split("\n")[0].split(',') ]
+            if "303 -" in i:
+                temp['random_all']=["".join(filter(lambda ch: ch in '0123456789.',j)) for j in i.split(" - ")[1].split("\n")[0].split(',') ]
+            if "305 -" in i:
+                temp['tai_mice_all']=["".join(filter(lambda ch: ch in '0123456789.',j)) for j in i.split(" - ")[1].split("\n")[0].split(',') ]
+            if "308 -" in i:
+                temp['tresai_mice_all']=["".join(filter(lambda ch: ch in '0123456789.',j)) for j in i.split(" - ")[1].split("\n")[0].split(',') ]
+            if "310 -" in i:
+                temp['tresai_ii_all']=["".join(filter(lambda ch: ch in '0123456789.',j)) for j in i.split(" - ")[1].split("\n")[0].split(',') ]
+                resu.append(temp)
+                temp={}
+
+    from prettytable import PrettyTable
+    import csv
+    # for row in range(len(resu)):
+    #     print("file:"+resu[row]['name'])
+    #     x=PrettyTable(['Method','pattern','RMSE','MAE',"MAPE"])
+    #     for i in ['mice','median','random','mida','gain','tai_mice','tresai_mice','tresai_ii',
+    #               'mice_all','median_all','random_all','tai_mice_all','tresai_mice_all','tresai_ii_all']:
+    #         try:
+    #             temp=["%.4f" % float(a) for a in resu[row][i]]
+    #         except:
+    #             temp=['NaN' for _ in resu[row][i]]
+    #         x.add_row([i] +[resu[row]['pattern']]+temp)
+    #     print(x)
+    #     print("---"*5+"***"*5+"---"*5)
+    f = open(save_path, 'w',newline='' ,encoding='utf-8')
+    csv_writer = csv.writer(f)
+    for row in range(len(resu)):
+        csv_writer.writerow(["file:"+resu[row]['name']])
+        csv_writer.writerow(['Method','pattern','RMSE','MAE',"MAPE"])
+        for i in ['mice','median','random','mida','gain','tai_mice','tresai_mice','tresai_ii','',
+                  'mice_all','median_all','random_all','tai_mice_all','tresai_mice_all','tresai_ii_all']:
+            if i=="":
+                csv_writer.writerow(['--','--','-','--','--'])
+            else:
+                try:
+                    temp=["%.4f" % float(a) for a in resu[row][i]]
+                except:
+                    temp=['NaN' for _ in resu[row][i]]
+
+                csv_writer.writerow([i] +[resu[row]['pattern']]+temp)
+    f.close()
 
 def readDistFile(path):
     data=pd.read_table(path,sep='\t',header=None)
@@ -170,7 +253,6 @@ def Longrich2010():
     print('knn', knn)
     print('me', me)
     print('sf', sf)
-
 def Dikow2009():
     path = r'C:\Users\pro\Desktop\int_data\TreeInAll\Dikow2009_co.txt'
     data=readDistFile(path)
@@ -240,15 +322,8 @@ def Liu2011():
 if __name__=="__main__":
     # Aria2015_rf()
     # Aria2015_co()
-    Longrich2010()
-    Dikow2009()
-    Liu2011()
-    # path=r'C:\Users\pro\Desktop\all_nex_data\Aria2015.nex'
-    # data,miss_row,speciesName=readNex(path)
-    # print(data)
-    # print(miss_row)
-    # print(speciesName)
-    # for ind,i in enumerate(speciesName):
-    #     print(ind,i)
-    # treeSpecies=r'C:\Users\pro\Desktop\Aria2015paper_result.txt'
-    # readTreeSpecies(treeSpecies,speciesName)
+    # Longrich2010()
+    # Dikow2009()
+    # Liu2011()
+    path=r'E:\labCode\autoencoders4imputation\logs\2020-08-06-00h.log'
+    read_result_log(path,'tai_tresai_test01_1.csv')
