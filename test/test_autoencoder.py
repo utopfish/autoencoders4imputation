@@ -42,6 +42,12 @@ for file in os.listdir(path):
     # origin_data, target = load_boston(return_X_y=True)
     for miss_pat in ['normal', 'block', 'taxa', 'chara']:
     # for miss_pat in ['normal', 'block']:
+        # 缺失比例只到0.5
+        half = []
+        methed_names_half = ['mice_misc', 'ii_misc', 'median_misc', 'random_misc', 'mida_misc', 'gain_misc']
+        # 缺失比例到0.9
+        all = []
+        methed_names_all = ['mice_misc', 'ii_misc', 'median_misc', 'random_misc']
         mice_misc = [[] for _ in range(3)]
         ii_misc = [[] for _ in range(3)]
         median_misc = [[] for _ in range(3)]
@@ -50,17 +56,12 @@ for file in os.listdir(path):
         gain_misc = [[] for _ in range(3)]
         for first_imputed_method in ['ii', 'mice']:
             for loss in ['MSELoss']:
-                for method in ['Autoencoder', 'ResAutoencoder', 'StockedAutoencoder', 'StockedAutoencoder',
+                for method in ['Autoencoder', 'ResAutoencoder',  'StockedAutoencoder',
                                'StockedResAutoencoder']:
                     varname = "{}_{}_{}".format(first_imputed_method, loss, method)
                     globals()[varname] = [[] for _ in range(3)]
 
-        # 缺失比例只到0.5
-        half = []
-        methed_names_half = ['mice_misc', 'ii_misc', 'median_misc', 'random_misc', 'mida_misc', 'gain_misc']
-        # 缺失比例到0.9
-        all = []
-        methed_names_all = ['mice_misc', 'ii_misc', 'median_misc', 'random_misc']
+
         for i in [0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
         # for i in [0.05, 0.1]:
             if miss_pat == 'normal':
@@ -150,10 +151,8 @@ for file in os.listdir(path):
 
             for first_imputed_method in ['ii','mice']:
                 for loss in ['MSELoss']:
-                    for method in ['Autoencoder','ResAutoencoder','StockedAutoencoder','StockedAutoencoder','StockedResAutoencoder']:
+                    for method in ['Autoencoder','ResAutoencoder','StockedAutoencoder','StockedResAutoencoder']:
                         varname = "{}_{}_{}".format(first_imputed_method, loss, method)
-                        methed_names_half.append(varname)
-                        methed_names_all.append(varname)
                         try:
                             start=time.time()
                             imputed_data, first_imputed_data = TAI(first_imputation_method=first_imputed_method,
@@ -168,8 +167,8 @@ for file in os.listdir(path):
                             logger.info("训练耗时:{}".format(time.time()-start))
                             score = RMSE(origin_data, imputed_data)
                             score1 = RMSE(origin_data, first_imputed_data)
-                            logger.info("{}_{}_{} first missing rate:{},RMSE:{}".format(first_imputed_method,loss,method,i, score1))
-                            logger.info("{}_{}_{} missing rate:{},RMSE:{}".format(first_imputed_method,loss,method,i, score))
+                            logger.info("{}_{}_{}_{}_{} first missing rate:{},RMSE:{}".format(file,miss_pat,first_imputed_method,loss,method,i, score1))
+                            logger.info("{}_{}_{}_{}_{} missing rate:{},RMSE:{}".format(file,miss_pat,first_imputed_method,loss,method,i, score))
 
 
                             globals()[varname][0].append(score)

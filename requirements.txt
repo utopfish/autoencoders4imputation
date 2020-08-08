@@ -10,6 +10,7 @@ easydict
 matplotlib
 fancyimpute
 torch
+loguru
 ycimpute
 prettytable
 torchvision

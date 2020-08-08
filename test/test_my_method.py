@@ -66,9 +66,9 @@ for file in os.listdir(path):
                 mice_misc[2].append(masked_mape_np(origin_data, imputed_data))
                 logger.info("MICE missing rate:{},RMSE:{}".format(i, score))
             except:
-                mice_misc[0].append(np.nan)
-                mice_misc[1].append(np.nan)
-                mice_misc[2].append(np.nan)
+                mice_misc[0].append(np.inf)
+                mice_misc[1].append(np.inf)
+                mice_misc[2].append(np.inf)
             try:
                 imputed_data = IterativeImputer().fit_transform(miss_data)
                 score = evaluate.RMSE(origin_data, imputed_data)
@@ -77,9 +77,9 @@ for file in os.listdir(path):
                 ii_misc[2].append(masked_mape_np(origin_data, imputed_data))
                 logger.info("fi IterativeImputer missing rate:{},RMSE:{}".format(i, score))
             except:
-                ii_misc[0].append(np.nan)
-                ii_misc[1].append(np.nan)
-                ii_misc[2].append(np.nan)
+                ii_misc[0].append(np.inf)
+                ii_misc[1].append(np.inf)
+                ii_misc[2].append(np.inf)
             try:
                 imputed_data = SimpleFill("median").fit_transform(miss_data)
                 score = evaluate.RMSE(origin_data, imputed_data)
@@ -88,9 +88,9 @@ for file in os.listdir(path):
                 median_misc[2].append(masked_mape_np(origin_data, imputed_data))
                 logger.info("fi median missing rate:{},RMSE:{}".format(i, score))
             except:
-                median_misc[0].append(np.nan)
-                median_misc[1].append(np.nan)
-                median_misc[2].append(np.nan)
+                median_misc[0].append(np.inf)
+                median_misc[1].append(np.inf)
+                median_misc[2].append(np.inf)
             try:
                 imputed_data = impyute.imputation.cs.random(miss_data)
                 score = evaluate.RMSE(origin_data, imputed_data)
@@ -99,9 +99,9 @@ for file in os.listdir(path):
                 random_misc[2].append(masked_mape_np(origin_data, imputed_data))
                 logger.info("random missing rate:{},RMSE:{}".format(i, score))
             except:
-                random_misc[0].append(np.nan)
-                random_misc[1].append(np.nan)
-                random_misc[2].append(np.nan)
+                random_misc[0].append(np.inf)
+                random_misc[1].append(np.inf)
+                random_misc[2].append(np.inf)
             try:
                 imputed_data = MIDA().complete(miss_data)
                 score = evaluate.RMSE(origin_data, imputed_data)
@@ -110,9 +110,9 @@ for file in os.listdir(path):
                 mida_misc[1].append(MAE(origin_data, imputed_data))
                 mida_misc[2].append(masked_mape_np(origin_data, imputed_data))
             except:
-                mida_misc[0].append(np.nan)
-                mida_misc[1].append(np.nan)
-                mida_misc[2].append(np.nan)
+                mida_misc[0].append(np.inf)
+                mida_misc[1].append(np.inf)
+                mida_misc[2].append(np.inf)
             try:
                 imputed_data = GAIN().complete(miss_data)
                 score = evaluate.RMSE(origin_data, imputed_data)
@@ -121,9 +121,9 @@ for file in os.listdir(path):
                 gain_misc[1].append(MAE(origin_data, imputed_data))
                 gain_misc[2].append(masked_mape_np(origin_data, imputed_data))
             except:
-                gain_misc[0].append(np.nan)
-                gain_misc[1].append(np.nan)
-                gain_misc[2].append(np.nan)
+                gain_misc[0].append(np.inf)
+                gain_misc[1].append(np.inf)
+                gain_misc[2].append(np.inf)
             try:
                 imputed_data, first_imputed_data = TAI().complete(miss_data)
                 score = evaluate.RMSE(origin_data, imputed_data)
@@ -134,9 +134,9 @@ for file in os.listdir(path):
                 tai_ii_misc[1].append(MAE(origin_data, imputed_data))
                 tai_ii_misc[2].append(masked_mape_np(origin_data, imputed_data))
             except:
-                tai_ii_misc[0].append(np.nan)
-                tai_ii_misc[1].append(np.nan)
-                tai_ii_misc[2].append(np.nan)
+                tai_ii_misc[0].append(np.inf)
+                tai_ii_misc[1].append(np.inf)
+                tai_ii_misc[2].append(np.inf)
 
             try:
                 imputed_data, first_imputed_data = TAI(first_imputation_method='mice', batch_size=len(miss_data),
@@ -152,9 +152,9 @@ for file in os.listdir(path):
                 tai_mice_misc[2].append(masked_mape_np(origin_data, imputed_data))
             except Exception as e:
                 logger.error(e)
-                tai_mice_misc[0].append(np.nan)
-                tai_mice_misc[1].append(np.nan)
-                tai_mice_misc[2].append(np.nan)
+                tai_mice_misc[0].append(np.inf)
+                tai_mice_misc[1].append(np.inf)
+                tai_mice_misc[2].append(np.inf)
 
             try:
                 imputed_data, first_imputed_data = TResAI(first_imputation_method='mice', batch_size=len(miss_data),
@@ -169,9 +169,9 @@ for file in os.listdir(path):
                 tresai_mice_misc[2].append(masked_mape_np(origin_data, imputed_data))
             except Exception as e:
                 logger.error(e)
-                tresai_mice_misc[0].append(np.nan)
-                tresai_mice_misc[1].append(np.nan)
-                tresai_mice_misc[2].append(np.nan)
+                tresai_mice_misc[0].append(np.inf)
+                tresai_mice_misc[1].append(np.inf)
+                tresai_mice_misc[2].append(np.inf)
 
             try:
                 imputed_data, first_imputed_data = TResAI(batch_size=len(miss_data),
@@ -186,9 +186,9 @@ for file in os.listdir(path):
                 tresai_ii_misc[2].append(masked_mape_np(origin_data, imputed_data))
             except Exception as e:
                 logger.error(e)
-                tresai_ii_misc[0].append(np.nan)
-                tresai_ii_misc[1].append(np.nan)
-                tresai_ii_misc[2].append(np.nan)
+                tresai_ii_misc[0].append(np.inf)
+                tresai_ii_misc[1].append(np.inf)
+                tresai_ii_misc[2].append(np.inf)
             # try:
             #     imputed_data , first_imputed_data= TAI(first_imputation_method='random',batch_size=len(miss_data),epochs=300,theta=int(len(miss_data[0])/2),iterations=30).complete(miss_data)
             #     score = evaluate.RMSE(origin_data, imputed_data)
@@ -198,7 +198,7 @@ for file in os.listdir(path):
             #     tai_random_misc.append(score)
             # except Exception as e:
             #     logger.error(e)
-            #     tai_random_misc.append(np.nan)
+            #     tai_random_misc.append(np.inf)
             #
             # try:
             #     imputed_data , first_imputed_data= TAI(first_imputation_method='None',batch_size=len(miss_data),epochs=500,theta=int(len(miss_data[0])/2),iterations=100).complete(miss_data)
@@ -209,7 +209,7 @@ for file in os.listdir(path):
             #     tai_none_misc.append(score)
             # except Exception as e:
             #     logger.error(e)
-            #     tai_none_misc.append(np.nan)
+            #     tai_none_misc.append(np.inf)
 
         color = ['blue', 'green', 'red', 'yellow', 'black', 'burlywood', 'cadetblue', 'chartreuse', 'purple', 'coral',
                  'aqua', 'aquamarine', 'darkblue', 'y', 'm']
