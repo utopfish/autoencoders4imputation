@@ -1,7 +1,6 @@
 xlrd
 numpy==1.16.0
 pandas
-loguru
 pytest
 Ipython
 jupyter

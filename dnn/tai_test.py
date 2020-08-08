@@ -20,15 +20,6 @@ from utils.tools import Solver
 from dnn.autoencoder_test_partice import Autoencoder,ResAutoencoder,StockedAutoencoder,StockedResAutoencoder
 from utils.normalizer import NORMALIZERS,RECOVER
 
-#超参数选择
-# from hyperopt import hp
-from ray import tune
-from ray.tune.suggest.hyperopt import HyperOptSearch
-from utils.handle_missingdata import gene_missingdata
-# space = {
-#     "lr": hp.loguniform("lr", 1e-10, 0.1),
-#     "momentum": hp.uniform("momentum", 0.1, 0.9),
-# }
 
 #baseline插补方法
 from ycimpute.imputer import  mice
@@ -38,6 +29,7 @@ from fancyimpute import IterativeImputer, SimpleFill
 imputation = {'median':SimpleFill("median").fit_transform,'random':random_inpute,'mice':mice.MICE().complete,'ii':IterativeImputer().fit_transform}
 AUTOENCODER_METHOD={'Autoencoder':Autoencoder,'ResAutoencoder':ResAutoencoder,'StockedAutoencoder':StockedAutoencoder,'StockedResAutoencoder':StockedResAutoencoder}
 LOSS={'MSELoss':torch.nn.MSELoss(),'CrossEntropyLoss':torch.nn.CrossEntropyLoss()}
+
 
 class TAI(Solver):
     def __init__(

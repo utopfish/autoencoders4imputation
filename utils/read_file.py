@@ -8,6 +8,9 @@ __author__ = "liuAmon"
 '''
 import pandas as pd
 import numpy as np
+import xlrd
+import xlwt
+from xlutils.copy import copy
 def readNex(path):
     info=[]
     speciesname=[]
@@ -80,7 +83,7 @@ def readTreeSpecies(path,speciesName):
             print(i)
 def read_result_log(path,save_path):
     '''
-    读取方法实验结果
+    读取方法实验结果,读取pub结果
     :param path str:
     :return:
     '''
@@ -130,20 +133,79 @@ def read_result_log(path,save_path):
                 resu.append(temp)
                 temp={}
 
-    from prettytable import PrettyTable
     import csv
-    # for row in range(len(resu)):
-    #     print("file:"+resu[row]['name'])
-    #     x=PrettyTable(['Method','pattern','RMSE','MAE',"MAPE"])
-    #     for i in ['mice','median','random','mida','gain','tai_mice','tresai_mice','tresai_ii',
-    #               'mice_all','median_all','random_all','tai_mice_all','tresai_mice_all','tresai_ii_all']:
-    #         try:
-    #             temp=["%.4f" % float(a) for a in resu[row][i]]
-    #         except:
-    #             temp=['NaN' for _ in resu[row][i]]
-    #         x.add_row([i] +[resu[row]['pattern']]+temp)
-    #     print(x)
-    #     print("---"*5+"***"*5+"---"*5)
+    f = open(save_path, 'w',newline='' ,encoding='utf-8')
+    csv_writer = csv.writer(f)
+    for row in range(len(resu)):
+        csv_writer.writerow(["file:"+resu[row]['name']])
+        csv_writer.writerow(['Method','pattern','RMSE','MAE',"MAPE"])
+        for i in ['mice','median','random','mida','gain','tai_mice','tresai_mice','tresai_ii','',
+                  'mice_all','median_all','random_all','tai_mice_all','tresai_mice_all','tresai_ii_all']:
+            if i=="":
+                csv_writer.writerow(['--','--','-','--','--'])
+            else:
+                try:
+                    temp=["%.4f" % float(a) for a in resu[row][i]]
+                except:
+                    temp=['NaN' for _ in resu[row][i]]
+
+                csv_writer.writerow([i] +[resu[row]['pattern']]+temp)
+    f.close()
+def read_result_log2(path,save_path):
+    '''
+    读取方法实验结果,读取ped结果
+    :param path str:
+    :return:
+    '''
+    with open(path) as file_obj:
+        content = file_obj.read()
+        resu=[]
+        temp={}
+
+        for i in content.split("\n"):
+            if "285 - file:" in i :
+                temp['name']=i.split("285 - file:")[1].split("\n")[0].replace("*","")
+            if "286 -" in i:
+                temp['pattern']=i.split("286 - pattern :")[1].split("\n")[0]
+            if "287 - " in i:
+                temp['rate']=i.split("287 - ")[1].split("\n")[0]
+            if "289 - " in i:
+                temp['mice']=["".join(filter(lambda ch: ch in '0123456789.',j)) for j in i.split(" - ")[1].split("\n")[0].split(',') ]
+            if "291 -" in i:
+                temp['ii']=["".join(filter(lambda ch: ch in '0123456789.',j)) for j in i.split(" - ")[1].split("\n")[0].split(',') ]
+            if "293 -" in i:
+                temp['median']=["".join(filter(lambda ch: ch in '0123456789.',j)) for j in i.split(" - ")[1].split("\n")[0].split(',') ]
+            if "295 -" in i:
+                temp['random']=["".join(filter(lambda ch: ch in '0123456789.',j)) for j in i.split(" - ")[1].split("\n")[0].split(',') ]
+            if "297 -" in i:
+                temp['mida']=["".join(filter(lambda ch: ch in '0123456789.',j)) for j in i.split(" - ")[1].split("\n")[0].split(',') ]
+            if "299 -" in i:
+                temp['gain']=["".join(filter(lambda ch: ch in '0123456789.',j)) for j in i.split(" - ")[1].split("\n")[0].split(',') ]
+            if "301 -" in i:
+                temp['tai_mice']=["".join(filter(lambda ch: ch in '0123456789.',j)) for j in i.split(" - ")[1].split("\n")[0].split(',') ]
+            if "304 -" in i:
+                temp['tresai_mice']=["".join(filter(lambda ch: ch in '0123456789.',j)) for j in i.split(" - ")[1].split("\n")[0].split(',') ]
+            if "306 -" in i:
+                temp['tresai_ii']=["".join(filter(lambda ch: ch in '0123456789.',j)) for j in i.split(" - ")[1].split("\n")[0].split(',') ]
+
+            if "311 -" in i:
+                temp['mice_all']=["".join(filter(lambda ch: ch in '0123456789.',j)) for j in i.split(" - ")[1].split("\n")[0].split(',') ]
+            if "313 -" in i:
+                temp['ii_all']=["".join(filter(lambda ch: ch in '0123456789.',j)) for j in i.split(" - ")[1].split("\n")[0].split(',') ]
+            if "315 -" in i:
+                temp['median_all']=["".join(filter(lambda ch: ch in '0123456789.',j)) for j in i.split(" - ")[1].split("\n")[0].split(',') ]
+            if "317 -" in i:
+                temp['random_all']=["".join(filter(lambda ch: ch in '0123456789.',j)) for j in i.split(" - ")[1].split("\n")[0].split(',') ]
+            if "319 -" in i:
+                temp['tai_mice_all']=["".join(filter(lambda ch: ch in '0123456789.',j)) for j in i.split(" - ")[1].split("\n")[0].split(',') ]
+            if "322 -" in i:
+                temp['tresai_mice_all']=["".join(filter(lambda ch: ch in '0123456789.',j)) for j in i.split(" - ")[1].split("\n")[0].split(',') ]
+            if "324 -" in i:
+                temp['tresai_ii_all']=["".join(filter(lambda ch: ch in '0123456789.',j)) for j in i.split(" - ")[1].split("\n")[0].split(',') ]
+                resu.append(temp)
+                temp={}
+
+    import csv
     f = open(save_path, 'w',newline='' ,encoding='utf-8')
     csv_writer = csv.writer(f)
     for row in range(len(resu)):
@@ -162,6 +224,41 @@ def read_result_log(path,save_path):
                 csv_writer.writerow([i] +[resu[row]['pattern']]+temp)
     f.close()
 
+
+def write_excel_xls(path, sheet_name, value):
+    index = len(value)  # 获取需要写入数据的行数
+    workbook = xlwt.Workbook()  # 新建一个工作簿
+    sheet = workbook.add_sheet(sheet_name)  # 在工作簿中新建一个表格
+    for i in range(0, index):
+        for j in range(0, len(value[i])):
+            sheet.write(i, j, value[i][j])  # 像表格中写入数据（对应的行和列）
+    workbook.save(path)
+def write_excel_xls_append(path, value):
+    index = len(value)  # 获取需要写入数据的行数
+    workbook = xlrd.open_workbook(path)  # 打开工作簿
+    sheets = workbook.sheet_names()  # 获取工作簿中的所有表格
+    worksheet = workbook.sheet_by_name(sheets[0])  # 获取工作簿中所有表格中的的第一个表格
+    rows_old = worksheet.nrows  # 获取表格中已存在的数据的行数
+    new_workbook = copy(workbook)  # 将xlrd对象拷贝转化为xlwt对象
+    new_worksheet = new_workbook.get_sheet(0)  # 获取转化后工作簿中的第一个表格
+    for i in range(0, index):
+        for j in range(0, len(value[i])):
+            new_worksheet.write(i + rows_old, j, value[i][j])  # 追加写入数据，注意是从i+rows_old行开始写入
+    new_workbook.save(path)  # 保存工作簿
+
+    #     csv_writer.writerow(['Method', 'pattern', 'RMSE', 'MAE', "MAPE"])
+    #     #     for i in ['mice', 'median', 'random', 'mida', 'gain', 'tai_mice', 'tresai_mice', 'tresai_ii', '',
+    #     #               'mice_all', 'median_all', 'random_all', 'tai_mice_all', 'tresai_mice_all', 'tresai_ii_all']:
+    #     #         if i == "":
+    #     #             csv_writer.writerow(['--', '--', '-', '--', '--'])
+    #     #         else:
+    #     #             try:
+    #     #                 temp = ["%.4f" % float(a) for a in resu[row][i]]
+    #     #             except:
+    #     #                 temp = ['NaN' for _ in resu[row][i]]
+    #     #
+    #     #             csv_writer.writerow([i] + [resu[row]['pattern']] + temp)
+    #     # f.close()
 def readDistFile(path):
     data=pd.read_table(path,sep='\t',header=None)
     data=data.values
@@ -325,5 +422,5 @@ if __name__=="__main__":
     # Longrich2010()
     # Dikow2009()
     # Liu2011()
-    path=r'E:\labCode\autoencoders4imputation\logs\2020-08-06-00h.log'
-    read_result_log(path,'tai_tresai_test01_1.csv')
+    path=r'E:\labCode\autoencoders4imputation\logs\2020-08-07-13h.log'
+    read_result_log2(path,'tai_tresai_test02.csv')
