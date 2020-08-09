@@ -26,8 +26,8 @@ from fancyimpute import KNN, NuclearNormMinimization, SoftImpute, IterativeImput
 from sklearn.datasets import load_boston
 from utils.read_file import write_excel_xls_append,write_excel_xls
 path = r'../public_data/'
-pciturePath = r'E:\labCode\picture_save\3_misc'
-save_path=r'E:\labCode\picture_save'
+pciturePath = r'../result/picture'
+save_path=r'../result/pub'
 total_result_half={}
 total_result_all={}
 for file in os.listdir(path):
@@ -60,6 +60,8 @@ for file in os.listdir(path):
                                'StockedResAutoencoder']:
                     varname = "{}_{}_{}".format(first_imputed_method, loss, method)
                     globals()[varname] = [[] for _ in range(3)]
+                    methed_names_half.append(varname)
+                    methed_names_all.append(varname)
 
 
         for i in [0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:

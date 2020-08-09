@@ -31,6 +31,8 @@ from fancyimpute import KNN, NuclearNormMinimization, SoftImpute, IterativeImput
 path = r'../nexus_files'
 pciturePath = r'../result/picture'
 save_path=r'../result/ped'
+total_result_half={}
+total_result_all={}
 for file in os.listdir(path):
     try:
         logger.info("**********************{}********************".format(file))
@@ -58,7 +60,7 @@ for file in os.listdir(path):
 
         for first_imputed_method in ['ii', 'mice']:
             for loss in ['MSELoss']:
-                for method in ['Autoencoder', 'ResAutoencoder', 'StockedAutoencoder'
+                for method in ['Autoencoder', 'ResAutoencoder', 'StockedAutoencoder',
                                'StockedResAutoencoder']:
                     varname = "{}_{}_{}".format(first_imputed_method, loss, method)
                     globals()[varname] = [[] for _ in range(3)]
