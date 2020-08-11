@@ -10,6 +10,10 @@ easydict
 matplotlib
 fancyimpute
 torch
+xlwt
+xlutils
+impyute
+prettytable
 loguru
 ycimpute
 prettytable
