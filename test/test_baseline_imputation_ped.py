@@ -21,7 +21,7 @@ from utils.handle_missingdata import gene_missingdata, gene_missingdata_taxa_bia
 from dnn.mida import MIDA
 from dnn.gain import GAIN
 from dnn.tai_test import TAI
-from utils.misc_utils import RMSE, MAE, masked_mape_np
+from utils.misc_utils import RMSE, MAE, masked_mape_np,TF
 from utils.base_impute import random_inpute
 from utils.base_tools import shear_dile
 from utils.read_file import readNex
@@ -37,7 +37,7 @@ for file in os.listdir(path):
     try:
         logger.info("**********************{}********************".format(file))
         data, misss_row, speciesname, begin, end = readNex(os.path.join(path, file))
-        data = data + 1
+        data = data + 10
     except ValueError:
         print("可能存在数据多态问题")
         #shear_dile(os.path.join(path, file), os.path.join("G:\labWork\cladistic-data-master\可能无用数据"))
@@ -51,24 +51,25 @@ for file in os.listdir(path):
         # 缺失比例到0.9
         all = []
         methed_names_all = ['mice_misc', 'ii_misc', 'median_misc', 'random_misc']
-        mice_misc = [[] for _ in range(3)]
-        ii_misc = [[] for _ in range(3)]
-        median_misc = [[] for _ in range(3)]
-        random_misc = [[] for _ in range(3)]
-        mida_misc = [[] for _ in range(3)]
-        gain_misc = [[] for _ in range(3)]
+        mice_misc = [[] for _ in range(4)]
+        ii_misc = [[] for _ in range(4)]
+        median_misc = [[] for _ in range(4)]
+        random_misc = [[] for _ in range(4)]
+        mida_misc = [[] for _ in range(4)]
+        gain_misc = [[] for _ in range(4)]
 
         for first_imputed_method in ['ii', 'mice']:
             for loss in ['MSELoss']:
                 for method in ['Autoencoder', 'ResAutoencoder', 'StockedAutoencoder',
                                'StockedResAutoencoder']:
                     varname = "{}_{}_{}".format(first_imputed_method, loss, method)
-                    globals()[varname] = [[] for _ in range(3)]
+                    globals()[varname] = [[] for _ in range(4)]
                     methed_names_half.append(varname)
                     methed_names_all.append(varname)
 
 
-        for i in [0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
+        # for i in [0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
+        for i in [0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]:
             if miss_pat == 'normal':
                 miss_data = gene_missingdata(rate=i, data=origin_data)
             elif miss_pat == 'taxa':
@@ -84,16 +85,18 @@ for file in os.listdir(path):
 
             try:
                 imputed_data = mice.MICE().complete(miss_data)
-                score = evaluate.RMSE(origin_data, imputed_data)
                 imputed_data = modifier(imputed_data, mark)
+                score = evaluate.RMSE(origin_data, imputed_data)
                 mice_misc[0].append(score)
                 mice_misc[1].append(MAE(origin_data, imputed_data))
                 mice_misc[2].append(masked_mape_np(origin_data, imputed_data))
+                mice_misc[3].append(TF(origin_data, imputed_data))
                 logger.info("MICE missing rate:{},RMSE:{}".format(i, score))
             except:
                 mice_misc[0].append(np.inf)
                 mice_misc[1].append(np.inf)
                 mice_misc[2].append(np.inf)
+                mice_misc[3].append(np.inf)
             try:
                 imputed_data = IterativeImputer().fit_transform(miss_data)
                 imputed_data = modifier(imputed_data, mark)
@@ -101,22 +104,27 @@ for file in os.listdir(path):
                 ii_misc[0].append(score)
                 ii_misc[1].append(MAE(origin_data, imputed_data))
                 ii_misc[2].append(masked_mape_np(origin_data, imputed_data))
+                ii_misc[3].append(TF(origin_data, imputed_data))
                 logger.info("fi IterativeImputer missing rate:{},RMSE:{}".format(i, score))
             except:
                 ii_misc[0].append(np.inf)
                 ii_misc[1].append(np.inf)
                 ii_misc[2].append(np.inf)
+                ii_misc[3].append(np.inf)
             try:
                 imputed_data = SimpleFill("median").fit_transform(miss_data)
+                imputed_data = modifier(imputed_data, mark)
                 score = evaluate.RMSE(origin_data, imputed_data)
                 median_misc[0].append(score)
                 median_misc[1].append(MAE(origin_data, imputed_data))
                 median_misc[2].append(masked_mape_np(origin_data, imputed_data))
+                median_misc[3].append(TF(origin_data, imputed_data))
                 logger.info("fi median missing rate:{},RMSE:{}".format(i, score))
             except:
                 median_misc[0].append(np.inf)
                 median_misc[1].append(np.inf)
                 median_misc[2].append(np.inf)
+                median_misc[3].append(np.inf)
             try:
                 imputed_data = impyute.imputation.cs.random(miss_data)
                 imputed_data = modifier(imputed_data, mark)
@@ -124,11 +132,13 @@ for file in os.listdir(path):
                 random_misc[0].append(score)
                 random_misc[1].append(MAE(origin_data, imputed_data))
                 random_misc[2].append(masked_mape_np(origin_data, imputed_data))
+                random_misc[3].append(TF(origin_data, imputed_data))
                 logger.info("random missing rate:{},RMSE:{}".format(i, score))
             except:
                 random_misc[0].append(np.inf)
                 random_misc[1].append(np.inf)
                 random_misc[2].append(np.inf)
+                random_misc[3].append(np.inf)
             try:
                 imputed_data = MIDA().complete(miss_data)
                 imputed_data = modifier(imputed_data, mark)
@@ -137,10 +147,12 @@ for file in os.listdir(path):
                 mida_misc[0].append(score)
                 mida_misc[1].append(MAE(origin_data, imputed_data))
                 mida_misc[2].append(masked_mape_np(origin_data, imputed_data))
+                mida_misc[3].append(TF(origin_data, imputed_data))
             except:
                 mida_misc[0].append(np.inf)
                 mida_misc[1].append(np.inf)
                 mida_misc[2].append(np.inf)
+                mida_misc[3].append(np.inf)
             try:
                 imputed_data = GAIN().complete(miss_data)
                 imputed_data = modifier(imputed_data, mark)
@@ -149,14 +161,16 @@ for file in os.listdir(path):
                 gain_misc[0].append(score)
                 gain_misc[1].append(MAE(origin_data, imputed_data))
                 gain_misc[2].append(masked_mape_np(origin_data, imputed_data))
+                gain_misc[3].append(TF(origin_data, imputed_data))
             except:
                 gain_misc[0].append(np.inf)
                 gain_misc[1].append(np.inf)
                 gain_misc[2].append(np.inf)
+                gain_misc[3].append(np.inf)
             for first_imputed_method in ['ii', 'mice']:
                     for loss in ['MSELoss']:
-                        for method in ['Autoencoder', 'ResAutoencoder', 'StockedAutoencoder',
-                                       'StockedResAutoencoder']:
+                        for method in ['Autoencoder', 'ResAutoencoder',
+                                       'StockedAutoencoder','StockedResAutoencoder']:
                             varname = "{}_{}_{}".format(first_imputed_method, loss, method)
                             try:
                                 start = time.time()
@@ -170,6 +184,7 @@ for file in os.listdir(path):
                                                                        use_cuda=False
                                                                        ).complete(miss_data)
                                 logger.info("训练耗时:{}".format(time.time() - start))
+                                imputed_data = modifier(imputed_data, mark)
                                 score = RMSE(origin_data, imputed_data)
                                 score1 = RMSE(origin_data, first_imputed_data)
                                 logger.info("{}_{}_{}_{}_{} first missing rate:{},RMSE:{}".format(file, miss_pat,
@@ -183,11 +198,13 @@ for file in os.listdir(path):
                                 globals()[varname][0].append(score)
                                 globals()[varname][1].append(MAE(origin_data, imputed_data))
                                 globals()[varname][2].append(masked_mape_np(origin_data, imputed_data))
+                                globals()[varname][3].append(TF(origin_data, imputed_data))
                             except Exception as e:
                                 logger.error(e)
                                 globals()[varname][0].append(np.inf)
                                 globals()[varname][1].append(np.inf)
                                 globals()[varname][2].append(np.inf)
+                                globals()[varname][3].append(np.inf)
 
         # 将三个指标在各个缺失状态下的结果求和
         logger.error("*" * 30)
@@ -195,16 +212,18 @@ for file in os.listdir(path):
         logger.error("pattern :{}".format(miss_pat))
         for varname in methed_names_half:
             half.append([sum(globals()[varname][0][0:3]), sum(globals()[varname][1][0:3]),
-                         sum(globals()[varname][2][0:3])])
+                         sum(globals()[varname][2][0:3]),sum(globals()[varname][3][0:3])])
             logger.error("half {} rmse:{} ,MAE:{},MAPE:{}".format(varname, sum(globals()[varname][0][0:3]),
                                                                   sum(globals()[varname][1][0:3]),
-                                                                  sum(globals()[varname][2][0:3])))
+                                                                  sum(globals()[varname][2][0:3]),
+                                                                  sum(globals()[varname][3][0:3])))
         for varname in methed_names_all:
             all.append([sum(globals()[varname][0]), sum(globals()[varname][1]),
-                        sum(globals()[varname][2])])
+                        sum(globals()[varname][2]),sum(globals()[varname][3])])
             logger.error("all {} rmse:{} ,MAE:{},MAPE:{}".format(varname, sum(globals()[varname][0]),
                                                                  sum(globals()[varname][1]),
-                                                                 sum(globals()[varname][2])))
+                                                                 sum(globals()[varname][2]),
+                                                                 sum(globals()[varname][3])))
 
         # 统计表现最好的方法
         half_np = np.array(half)
@@ -212,7 +231,7 @@ for file in os.listdir(path):
         # 记录一个数据集，一个缺失模式下的最优情况
         once_total_result_half = {}
         once_total_result_all = {}
-        for index in range(3):
+        for index in range(4):
             min_index = np.argmin(half_np[:, index])
             if methed_names_half[min_index] not in once_total_result_half.keys():
                 once_total_result_half[methed_names_half[min_index]] = 1
@@ -226,12 +245,13 @@ for file in os.listdir(path):
                 once_total_result_all[methed_names_all[min_index]] += 1
 
         # 将结果打印到excel表
-        value = [['Method', 'pattern', 'RMSE', 'MAE', "MAPE", 'Winner times']]
+        value = [['Method', 'pattern', 'RMSE', 'MAE', "MAPE", "TF",'Winner times']]
         for varname in methed_names_half:
             value.append([varname + '-half', miss_pat,
                           sum(globals()[varname][0][0:3]),
                           sum(globals()[varname][1][0:3]),
                           sum(globals()[varname][2][0:3]),
+                          sum(globals()[varname][3][0:3]),
                           0 if varname not in once_total_result_half else once_total_result_half[varname]])
         value.append(['--' * 4])
         for varname in methed_names_all:
@@ -239,6 +259,7 @@ for file in os.listdir(path):
                           sum(globals()[varname][0]),
                           sum(globals()[varname][1]),
                           sum(globals()[varname][2]),
+                          sum(globals()[varname][3]),
                           0 if varname not in once_total_result_all else once_total_result_all[varname]])
 
         try:
@@ -249,7 +270,7 @@ for file in os.listdir(path):
         logger.warning("best imptation half:{}".format(once_total_result_half))
         logger.warning("best imptation all:{}".format(once_total_result_all))
         logger.warning("detail:")
-        x = PrettyTable(['Method', 'pattern', 'size', 'RMSE', 'MAE', "MAPE"])
+        x = PrettyTable(['Method', 'pattern', 'size', 'RMSE', 'MAE', "MAPE","TF"])
         for index, names in enumerate(methed_names_half):
             try:
                 temp = ["{:.4f}".format(i) for i in half[index]]
@@ -257,7 +278,7 @@ for file in os.listdir(path):
                 temp = ['NaN' for _ in half[index]]
             x.add_row([names] + [miss_pat] + ['half'] + temp)
             logger.warning(x)
-        x = PrettyTable(['Method', 'pattern', 'size', 'RMSE', 'MAE', "MAPE"])
+        x = PrettyTable(['Method', 'pattern', 'size', 'RMSE', 'MAE', "MAPE","TF"])
         for index, names in enumerate(methed_names_all):
             try:
                 temp = ["{:.4f}".format(i) for i in all[index]]

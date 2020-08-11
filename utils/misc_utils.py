@@ -89,11 +89,15 @@ def masked_mape_np(y_true, y_pred, null_val=0):
         mape = np.abs(np.divide((y_pred - y_true).astype('float32'), y_true))
         mape = np.nan_to_num(mask * mape)
         return np.mean(mape) * 100
-
+def TF(y_true, y_pred):
+    "相等差为0，不等为1"
+    return np.mean(np.where(np.abs(y_true - y_pred)>0,1,0))
 if __name__=="__main__":
     li1=np.array([1,2,3,4])
     li2=np.array([1,3,4,5])
-    print(np.square(li1-li2))
-    print(distance(li1,li2,"euclidean"))
-    print(distance(li1,li2,"jaccard"))
-    print(distance(li1,li2,"hamming"))
+    # print(np.square(li1-li2))
+    # print(distance(li1,li2,"euclidean"))
+    # print(distance(li1,li2,"jaccard"))
+    # print(distance(li1,li2,"hamming"))
+    print(RMSE(li1,li2))
+    print(TF(li1,li2))
