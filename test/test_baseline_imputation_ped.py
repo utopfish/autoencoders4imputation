@@ -30,7 +30,7 @@ from fancyimpute import KNN, NuclearNormMinimization, SoftImpute, IterativeImput
 
 path = r'../nexus_files'
 pciturePath = r'../result/picture'
-save_path=r'../result/ped'
+save_path=r'../result/ped_s'
 total_result_half={}
 total_result_all={}
 for file in os.listdir(path):
