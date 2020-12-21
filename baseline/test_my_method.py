@@ -7,8 +7,7 @@
 import os
 import impyute
 import numpy as np
-import pandas as pd
-
+import math
 from logger import logger
 from ycimpute.utils import evaluate
 from utils.misc_utils import RMSE, MAE, masked_mape_np
@@ -29,16 +28,17 @@ for file in os.listdir(path):
     # data = pd.read_excel(os.path.join(path, file), sheet_name="dataset")
     # dt = np.array(data.values)
     # data = dt.astype('float')
-    # origin_data = data[:, :-1]
+    # originData = data[:, :-1]
     # target = data[:, -1]
     file = "boston"
-    origin_data, target = load_boston(return_X_y=True)
-    # for miss_pat in ['normal','taxa','chara','block']:
-    for miss_pat in ['normal', 'block', 'taxa', 'chara']:
+    originData, target = load_boston(return_X_y=True)
+    for missPattern in ['normal']:
+    #for missPattern in ['normal', 'block', 'taxa', 'chara']:
         mice_misc = [[] for _ in range(3)]
         ii_misc = [[] for _ in range(3)]
         median_misc = [[] for _ in range(3)]
         random_misc = [[] for _ in range(3)]
+        knn_misc = [[] for _ in range(3)]
         mida_misc = [[] for _ in range(3)]
         gain_misc = [[] for _ in range(3)]
         tai_ii_misc = [[] for _ in range(3)]
@@ -48,108 +48,121 @@ for file in os.listdir(path):
         tresai_mice_misc = [[] for _ in range(3)]
         tresai_ii_misc = [[] for _ in range(3)]
         for i in [0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
-            if miss_pat == 'normal':
-                miss_data = gene_missingdata(rate=i, data=origin_data)
-            elif miss_pat == 'taxa':
-                miss_data = gene_missingdata_taxa_bias(rate=i, data=origin_data)
-            elif miss_pat == 'chara':
-                miss_data = gene_missingdata_chara_bias(rate=i, data=origin_data)
-            elif miss_pat == 'block':
-                miss_data = gene_missingdata_block_bias(rate=i, data=origin_data)
+            if missPattern == 'normal':
+                missData = gene_missingdata(rate=i, data=originData)
+            elif missPattern == 'taxa':
+                missData = gene_missingdata_taxa_bias(rate=i, data=originData)
+            elif missPattern == 'chara':
+                missData = gene_missingdata_chara_bias(rate=i, data=originData)
+            elif missPattern == 'block':
+                missData = gene_missingdata_block_bias(rate=i, data=originData)
             else:
                 raise Exception("缺失模式错误，请在'normal','taxa','chara','block'中选择对应模式")
             try:
-                imputed_data = mice.MICE().complete(miss_data)
-                score = evaluate.RMSE(origin_data, imputed_data)
+                imputedData = mice.MICE().complete(missData)
+                score = evaluate.RMSE(originData, imputedData)
                 mice_misc[0].append(score)
-                mice_misc[1].append(MAE(origin_data, imputed_data))
-                mice_misc[2].append(masked_mape_np(origin_data, imputed_data))
+                mice_misc[1].append(MAE(originData, imputedData))
+                mice_misc[2].append(masked_mape_np(originData, imputedData))
                 logger.info("MICE missing rate:{},RMSE:{}".format(i, score))
             except:
                 mice_misc[0].append(np.inf)
                 mice_misc[1].append(np.inf)
                 mice_misc[2].append(np.inf)
             try:
-                imputed_data = IterativeImputer().fit_transform(miss_data)
-                score = evaluate.RMSE(origin_data, imputed_data)
+                imputedData = IterativeImputer().fit_transform(missData)
+                score = evaluate.RMSE(originData, imputedData)
                 ii_misc[0].append(score)
-                ii_misc[1].append(MAE(origin_data, imputed_data))
-                ii_misc[2].append(masked_mape_np(origin_data, imputed_data))
+                ii_misc[1].append(MAE(originData, imputedData))
+                ii_misc[2].append(masked_mape_np(originData, imputedData))
                 logger.info("fi IterativeImputer missing rate:{},RMSE:{}".format(i, score))
             except:
                 ii_misc[0].append(np.inf)
                 ii_misc[1].append(np.inf)
                 ii_misc[2].append(np.inf)
             try:
-                imputed_data = SimpleFill("median").fit_transform(miss_data)
-                score = evaluate.RMSE(origin_data, imputed_data)
+                imputedData = SimpleFill("median").fit_transform(missData)
+                score = evaluate.RMSE(originData, imputedData)
                 median_misc[0].append(score)
-                median_misc[1].append(MAE(origin_data, imputed_data))
-                median_misc[2].append(masked_mape_np(origin_data, imputed_data))
+                median_misc[1].append(MAE(originData, imputedData))
+                median_misc[2].append(masked_mape_np(originData, imputedData))
                 logger.info("fi median missing rate:{},RMSE:{}".format(i, score))
             except:
                 median_misc[0].append(np.inf)
                 median_misc[1].append(np.inf)
                 median_misc[2].append(np.inf)
             try:
-                imputed_data = impyute.imputation.cs.random(miss_data)
-                score = evaluate.RMSE(origin_data, imputed_data)
+                imputedData = impyute.imputation.cs.random(missData)
+                score = evaluate.RMSE(originData, imputedData)
                 random_misc[0].append(score)
-                random_misc[1].append(MAE(origin_data, imputed_data))
-                random_misc[2].append(masked_mape_np(origin_data, imputed_data))
+                random_misc[1].append(MAE(originData, imputedData))
+                random_misc[2].append(masked_mape_np(originData, imputedData))
                 logger.info("random missing rate:{},RMSE:{}".format(i, score))
             except:
                 random_misc[0].append(np.inf)
                 random_misc[1].append(np.inf)
                 random_misc[2].append(np.inf)
             try:
-                imputed_data = MIDA().complete(miss_data)
-                score = evaluate.RMSE(origin_data, imputed_data)
+                imputedData = MIDA().complete(missData)
+                score = evaluate.RMSE(originData, imputedData)
                 logger.info("MIDA missing rate:{},RMSE:{}".format(i, score))
                 mida_misc[0].append(score)
-                mida_misc[1].append(MAE(origin_data, imputed_data))
-                mida_misc[2].append(masked_mape_np(origin_data, imputed_data))
+                mida_misc[1].append(MAE(originData, imputedData))
+                mida_misc[2].append(masked_mape_np(originData, imputedData))
             except:
                 mida_misc[0].append(np.inf)
                 mida_misc[1].append(np.inf)
                 mida_misc[2].append(np.inf)
+            #KNN 缺失插补
+
             try:
-                imputed_data = GAIN().complete(miss_data)
-                score = evaluate.RMSE(origin_data, imputed_data)
+                imputedData = KNN(k=int(math.sqrt(len(missData)))).fit_transform(missData)
+                score = evaluate.RMSE(originData, imputedData)
+                logger.info("KNN missing rate:{},RMSE:{}".format(i, score))
+                knn_misc[0].append(score)
+                knn_misc[1].append(MAE(originData, imputedData))
+                knn_misc[2].append(masked_mape_np(originData, imputedData))
+            except:
+                knn_misc[0].append(np.inf)
+                knn_misc[1].append(np.inf)
+                knn_misc[2].append(np.inf)
+            try:
+                imputedData = GAIN().complete(missData)
+                score = evaluate.RMSE(originData, imputedData)
                 logger.info("GAIN missing rate:{},RMSE:{}".format(i, score))
                 gain_misc[0].append(score)
-                gain_misc[1].append(MAE(origin_data, imputed_data))
-                gain_misc[2].append(masked_mape_np(origin_data, imputed_data))
+                gain_misc[1].append(MAE(originData, imputedData))
+                gain_misc[2].append(masked_mape_np(originData, imputedData))
             except:
                 gain_misc[0].append(np.inf)
                 gain_misc[1].append(np.inf)
                 gain_misc[2].append(np.inf)
             try:
-                imputed_data, first_imputed_data = TAI().complete(miss_data)
-                score = evaluate.RMSE(origin_data, imputed_data)
-                score1 = evaluate.RMSE(origin_data, first_imputed_data)
+                imputedData, first_imputedData = TAI().complete(missData)
+                score = evaluate.RMSE(originData, imputedData)
+                score1 = evaluate.RMSE(originData, first_imputedData)
                 logger.info("TAI ii first missing rate:{},RMSE:{}".format(i, score1))
                 logger.info("TAI ii missing rate:{},RMSE:{}".format(i, score))
                 tai_ii_misc[0].append(score)
-                tai_ii_misc[1].append(MAE(origin_data, imputed_data))
-                tai_ii_misc[2].append(masked_mape_np(origin_data, imputed_data))
+                tai_ii_misc[1].append(MAE(originData, imputedData))
+                tai_ii_misc[2].append(masked_mape_np(originData, imputedData))
             except:
                 tai_ii_misc[0].append(np.inf)
                 tai_ii_misc[1].append(np.inf)
                 tai_ii_misc[2].append(np.inf)
 
             try:
-                imputed_data, first_imputed_data = TAI(first_imputation_method='mice', batch_size=len(miss_data),
-                                                       epochs=300, theta=int(len(miss_data[0]) / 2),
-                                                       iterations=30).complete(miss_data)
-                score = evaluate.RMSE(origin_data, imputed_data)
-                score1 = evaluate.RMSE(origin_data, first_imputed_data)
+                imputedData, first_imputedData = TAI(first_imputation_method='mice', batch_size=len(missData),
+                                                       epochs=300, theta=int(len(missData[0]) / 2),
+                                                       iterations=30).complete(missData)
+                score = evaluate.RMSE(originData, imputedData)
+                score1 = evaluate.RMSE(originData, first_imputedData)
                 logger.info("TAI mice first missing rate:{},RMSE:{}".format(i, score1))
                 logger.info("TAI mice missing rate:{},RMSE:{}".format(i, score))
 
                 tai_mice_misc[0].append(score)
-                tai_mice_misc[1].append(MAE(origin_data, imputed_data))
-                tai_mice_misc[2].append(masked_mape_np(origin_data, imputed_data))
+                tai_mice_misc[1].append(MAE(originData, imputedData))
+                tai_mice_misc[2].append(masked_mape_np(originData, imputedData))
             except Exception as e:
                 logger.error(e)
                 tai_mice_misc[0].append(np.inf)
@@ -157,16 +170,16 @@ for file in os.listdir(path):
                 tai_mice_misc[2].append(np.inf)
 
             try:
-                imputed_data, first_imputed_data = TResAI(first_imputation_method='mice', batch_size=len(miss_data),
-                                                          epochs=300, theta=int(len(miss_data[0]) / 2),
-                                                          iterations=30).complete(miss_data)
-                score = evaluate.RMSE(origin_data, imputed_data)
-                score1 = evaluate.RMSE(origin_data, first_imputed_data)
+                imputedData, first_imputedData = TResAI(first_imputation_method='mice', batch_size=len(missData),
+                                                          epochs=300, theta=int(len(missData[0]) / 2),
+                                                          iterations=30).complete(missData)
+                score = evaluate.RMSE(originData, imputedData)
+                score1 = evaluate.RMSE(originData, first_imputedData)
                 logger.info("TResAI mice first missing rate:{},RMSE:{}".format(i, score1))
                 logger.info("TResAI mice missing rate:{},RMSE:{}".format(i, score))
                 tresai_mice_misc[0].append(score)
-                tresai_mice_misc[1].append(MAE(origin_data, imputed_data))
-                tresai_mice_misc[2].append(masked_mape_np(origin_data, imputed_data))
+                tresai_mice_misc[1].append(MAE(originData, imputedData))
+                tresai_mice_misc[2].append(masked_mape_np(originData, imputedData))
             except Exception as e:
                 logger.error(e)
                 tresai_mice_misc[0].append(np.inf)
@@ -174,25 +187,25 @@ for file in os.listdir(path):
                 tresai_mice_misc[2].append(np.inf)
 
             try:
-                imputed_data, first_imputed_data = TResAI(batch_size=len(miss_data),
-                                                          epochs=300, theta=int(len(miss_data[0]) / 2),
-                                                          iterations=30).complete(miss_data)
-                score = evaluate.RMSE(origin_data, imputed_data)
-                score1 = evaluate.RMSE(origin_data, first_imputed_data)
+                imputedData, first_imputedData = TResAI(batch_size=len(missData),
+                                                          epochs=300, theta=int(len(missData[0]) / 2),
+                                                          iterations=30).complete(missData)
+                score = evaluate.RMSE(originData, imputedData)
+                score1 = evaluate.RMSE(originData, first_imputedData)
                 logger.info("TResAI ii first missing rate:{},RMSE:{}".format(i, score1))
                 logger.info("TResAI ii missing rate:{},RMSE:{}".format(i, score))
                 tresai_ii_misc[0].append(score)
-                tresai_ii_misc[1].append(MAE(origin_data, imputed_data))
-                tresai_ii_misc[2].append(masked_mape_np(origin_data, imputed_data))
+                tresai_ii_misc[1].append(MAE(originData, imputedData))
+                tresai_ii_misc[2].append(masked_mape_np(originData, imputedData))
             except Exception as e:
                 logger.error(e)
                 tresai_ii_misc[0].append(np.inf)
                 tresai_ii_misc[1].append(np.inf)
                 tresai_ii_misc[2].append(np.inf)
             # try:
-            #     imputed_data , first_imputed_data= TAI(first_imputation_method='random',batch_size=len(miss_data),epochs=300,theta=int(len(miss_data[0])/2),iterations=30).complete(miss_data)
-            #     score = evaluate.RMSE(origin_data, imputed_data)
-            #     score1 = evaluate.RMSE(origin_data, first_imputed_data)
+            #     imputedData , first_imputedData= TAI(first_imputation_method='random',batch_size=len(missData),epochs=300,theta=int(len(missData[0])/2),iterations=30).complete(missData)
+            #     score = evaluate.RMSE(originData, imputedData)
+            #     score1 = evaluate.RMSE(originData, first_imputedData)
             #     logger.info("TAI random first missing rate:{},RMSE:{}".format(i, score1))
             #     logger.info("TAI random missing rate:{},RMSE:{}".format(i, score))
             #     tai_random_misc.append(score)
@@ -201,9 +214,9 @@ for file in os.listdir(path):
             #     tai_random_misc.append(np.inf)
             #
             # try:
-            #     imputed_data , first_imputed_data= TAI(first_imputation_method='None',batch_size=len(miss_data),epochs=500,theta=int(len(miss_data[0])/2),iterations=100).complete(miss_data)
-            #     score = evaluate.RMSE(origin_data, imputed_data)
-            #     score1 = evaluate.RMSE(origin_data, first_imputed_data)
+            #     imputedData , first_imputedData= TAI(first_imputation_method='None',batch_size=len(missData),epochs=500,theta=int(len(missData[0])/2),iterations=100).complete(missData)
+            #     score = evaluate.RMSE(originData, imputedData)
+            #     score1 = evaluate.RMSE(originData, first_imputedData)
             #     logger.info("TAI none first missing rate:{},RMSE:{}".format(i, score1))
             #     logger.info("TAI none missing rate:{},RMSE:{}".format(i, score))
             #     tai_none_misc.append(score)
@@ -225,9 +238,9 @@ for file in os.listdir(path):
         plt.plot(x, tai_mice_misc[0], color=color[12], linewidth=2.0, linestyle='-', label='tai mice')
         # plt.plot(x, tai_random_misc, color=color[0], linewidth=2.0, linestyle='-', label='tai random')
         plt.plot(x, tresai_mice_misc[0], color=color[3], linewidth=2.0, linestyle='-', label='tresai mice')
-        plt.title("rmse of different missing rate in {}_{}".format(file, miss_pat))
+        plt.title("rmse of different missing rate in {}_{}".format(file, missPattern))
         plt.legend(loc="upper left")
-        plt.savefig(os.path.join(pciturePath, "rmse_of_different_missing_rate_in_{}_{}.png".format(file, miss_pat)))
+        plt.savefig(os.path.join(pciturePath, "rmse_of_different_missing_rate_in_{}_{}.png".format(file, missPattern)))
         plt.show()
         print("*" * 20)
 
@@ -243,9 +256,9 @@ for file in os.listdir(path):
         plt.plot(x, tai_mice_misc[1], color=color[12], linewidth=2.0, linestyle='-', label='tai mice')
         # plt.plot(x, tai_random_misc, color=color[0], linewidth=2.0, linestyle='-', label='tai random')
         plt.plot(x, tresai_mice_misc[1], color=color[3], linewidth=2.0, linestyle='-', label='tresai mice')
-        plt.title("MAE of different missing rate in {}_{}".format(file, miss_pat))
+        plt.title("MAE of different missing rate in {}_{}".format(file, missPattern))
         plt.legend(loc="upper left")
-        plt.savefig(os.path.join(pciturePath, "MAE_of_different_missing_rate_in_{}_{}.png".format(file, miss_pat)))
+        plt.savefig(os.path.join(pciturePath, "MAE_of_different_missing_rate_in_{}_{}.png".format(file, missPattern)))
         plt.show()
         print("*" * 20)
 
@@ -261,15 +274,15 @@ for file in os.listdir(path):
         plt.plot(x, tai_mice_misc[2], color=color[12], linewidth=2.0, linestyle='-', label='tai mice')
         # plt.plot(x, tai_random_misc, color=color[0], linewidth=2.0, linestyle='-', label='tai random')
         plt.plot(x, tresai_mice_misc[2], color=color[3], linewidth=2.0, linestyle='-', label='tresai mice')
-        plt.title("mape of different missing rate in {}_{}".format(file, miss_pat))
+        plt.title("mape of different missing rate in {}_{}".format(file, missPattern))
         plt.legend(loc="upper left")
-        plt.savefig(os.path.join(pciturePath, "mape_of_different_missing_rate_in_{}_{}.png".format(file, miss_pat)))
+        plt.savefig(os.path.join(pciturePath, "mape_of_different_missing_rate_in_{}_{}.png".format(file, missPattern)))
         plt.show()
         print("*" * 20)
 
         logger.error("*" * 30)
         logger.error("file:{}".format(file))
-        logger.error("pattern :{}".format(miss_pat))
+        logger.error("pattern :{}".format(missPattern))
         logger.error("0.05-0.3")
         logger.error("mice rmse:{} ,MAE:{},MAPE:{}".format(sum(mice_misc[0][0:3]), sum(mice_misc[1][0:3]),
                                                            sum(mice_misc[2][0:3])))

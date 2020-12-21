@@ -201,27 +201,27 @@ if __name__=="__main__":
         print("可能存在数据多态问题")
         # continue
     # try:
-    imputed_data = random_inpute(data)
-    saveData(fileSavePath, '{}_init.tnt'.format(file), speciesname, imputed_data, begin, end)
+    imputedData = random_inpute(data)
+    saveData(fileSavePath, '{}_init.tnt'.format(file), speciesname, imputedData, begin, end)
 
     logger.info("**********************{}********************".format(file))
     for  i in [0.05,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]:
-        miss_data= gene_missingdata(rate=i, data=imputed_data)
+        missData= gene_missingdata(rate=i, data=imputedData)
 
         logger.info("{}============".format(i))
-        logger.info("random MSE:{}".format(MSE(imputed_data,random_inpute(miss_data))))
+        logger.info("random MSE:{}".format(MSE(imputedData,random_inpute(missData))))
 
-        mask=get_mask(miss_data)
-        miss_location=get_miss_location(miss_data)
+        mask=get_mask(missData)
+        miss_location=get_miss_location(missData)
         #数据均值化
         # min_max_scaler = preprocessing.MinMaxScaler()
-        # mm_miss_data = min_max_scaler.fit_transform(miss_data)
+        # mm_missData = min_max_scaler.fit_transform(missData)
         modelName = file + str(i)
-        inp = interpolation_mask_onehot(modelName=modelName, completeData=random_inpute(miss_data))
+        inp = interpolation_mask_onehot(modelName=modelName, completeData=random_inpute(missData))
         if not os.path.exists(os.path.join(modelSavePath, '{}.pkl'.format(modelName))):
             inp.fit(os.path.join(modelSavePath, '{}.pkl'.format(modelName)),mask)
 
-        pred_data, fix_data = inp.prd(miss_data, model=os.path.join(modelSavePath, '{}.pkl'.format(modelName)))
+        pred_data, fix_data = inp.prd(missData, model=os.path.join(modelSavePath, '{}.pkl'.format(modelName)))
 
         s = pd.DataFrame(np.unique(pred_data)).dropna(axis=0).values
         s=[i[0] for i in s]
@@ -236,51 +236,51 @@ if __name__=="__main__":
         logger.info("number of charater :{}".format(len(s)))
         pred_data = modifier(pred_data, s)
         pred_data = pred_data.astype(int)
-        logger.info("初步插补 MSE:{}".format(MSE(imputed_data, pred_data)))
-        logger.info("ae MSE:{}".format(MSE(imputed_data,fix_data)))
+        logger.info("初步插补 MSE:{}".format(MSE(imputedData, pred_data)))
+        logger.info("ae MSE:{}".format(MSE(imputedData,fix_data)))
 
-        # logger.info("初步插补 TF:{}".format(TF(imputed_data, pred_data)))
-        # logger.info("ae TF:{}".format(TF(imputed_data, fix_data)))
+        # logger.info("初步插补 TF:{}".format(TF(imputedData, pred_data)))
+        # logger.info("ae TF:{}".format(TF(imputedData, fix_data)))
 
-        X_filled_knn = KNN(k=3).fit_transform(miss_data)
+        X_filled_knn = KNN(k=3).fit_transform(missData)
         re_X = inp.revise(modifier(X_filled_knn, s), miss_location,
                                      model=os.path.join(modelSavePath, '{}.pkl'.format(modelName)))
         re_X = modifier(re_X, s)
         re_X = re_X.astype(int)
         X_filled_knn = modifier(X_filled_knn, s)
         X_filled_knn = X_filled_knn.astype(int)
-        logger.info("knn MSE:{}".format(MSE(imputed_data, X_filled_knn)))
-        logger.info("knn res MSE:{}".format(MSE(imputed_data, re_X)))
+        logger.info("knn MSE:{}".format(MSE(imputedData, X_filled_knn)))
+        logger.info("knn res MSE:{}".format(MSE(imputedData, re_X)))
         logger.info("res  change MSE:{}".format(MSE(X_filled_knn, re_X)))
 
-        # X_filled_ii = IterativeImputer().fit_transform(mm_miss_data)
+        # X_filled_ii = IterativeImputer().fit_transform(mm_missData)
         # re_X = inp.revise(X_filled_ii, miss_location,
         #                   model=os.path.join(modelSavePath, '{}.pkl'.format(modelName)))
         # X_filled_ii = restore(min_max_scaler=min_max_scaler,s=s,data=X_filled_ii)
         # re_X = restore(min_max_scaler=min_max_scaler, s=s, data=re_X)
-        # logger.info("ii MSE:{}".format(MSE(imputed_data, X_filled_ii)))
-        # logger.info("ii res MSE:{}".format(MSE(imputed_data,  re_X)))
+        # logger.info("ii MSE:{}".format(MSE(imputedData, X_filled_ii)))
+        # logger.info("ii res MSE:{}".format(MSE(imputedData,  re_X)))
 
-        X_filled_sf = SimpleFill().fit_transform(miss_data)
+        X_filled_sf = SimpleFill().fit_transform(missData)
         re_X  = inp.revise(modifier(X_filled_sf, s), miss_location,
                                      model=os.path.join(modelSavePath, '{}.pkl'.format(modelName)))
         re_X = modifier(re_X, s)
         re_X = re_X.astype(int)
         X_filled_sf = modifier(X_filled_sf, s)
         X_filled_sf = X_filled_sf.astype(int)
-        logger.info("sf MSE:{}".format(MSE(imputed_data, X_filled_sf)))
-        logger.info("sf res MSE:{}".format(MSE(imputed_data, re_X)))
+        logger.info("sf MSE:{}".format(MSE(imputedData, X_filled_sf)))
+        logger.info("sf res MSE:{}".format(MSE(imputedData, re_X)))
         logger.info("res  change MSE:{}".format(MSE(X_filled_sf, re_X)))
 
-        X_filled_me = SimpleFill("median").fit_transform(miss_data)
+        X_filled_me = SimpleFill("median").fit_transform(missData)
         re_X = inp.revise(modifier(X_filled_me, s), miss_location,
                           model=os.path.join(modelSavePath, '{}.pkl'.format(modelName)))
         re_X = modifier(re_X, s)
         re_X = re_X.astype(int)
         X_filled_me = modifier(X_filled_me, s)
         X_filled_me =X_filled_me.astype(int)
-        logger.info("median MSE:{}".format(MSE(imputed_data, X_filled_me)))
-        logger.info("median res MSE:{}".format(MSE(imputed_data,re_X)))
+        logger.info("median MSE:{}".format(MSE(imputedData, X_filled_me)))
+        logger.info("median res MSE:{}".format(MSE(imputedData,re_X)))
         logger.info("res  change MSE:{}".format(MSE(X_filled_me, re_X)))
     # except Exception as e:
     #     logger.error(e)

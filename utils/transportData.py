@@ -130,7 +130,7 @@ if __name__=="__main__":
     # dirtyhand()
     filePath=r'C:\Users\pro\Desktop\usefulDataSimple\07tre'
     nexfile='07LiaoEA10Rasborafish.nex'
-    origin_data, miss_mask, speciesName, begin, end = readNex(os.path.join(filePath, nexfile))
+    originData, miss_mask, speciesName, begin, end = readNex(os.path.join(filePath, nexfile))
     for file in os.listdir(filePath):
         if file.endswith('tre'):
             treeSpecies = os.path.join(filePath, file)

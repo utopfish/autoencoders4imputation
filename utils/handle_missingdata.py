@@ -20,39 +20,39 @@ def gene_missingdata(rate,data,seed=0):
     :return:缺失后数据集和缺失行数
     '''
     #random.seed=seed
-    miss_data=data.copy()
-    nrow, ncol = miss_data.shape
+    missData=data.copy()
+    nrow, ncol = missData.shape
     myList = list(np.linspace(0, ncol*nrow-1, ncol*nrow, dtype=int))
     choice_num=random.sample(myList,int(ncol*nrow*rate))
     for num in choice_num:
         row=num%nrow
         col=num//nrow
-        miss_data[row][col] = np.nan
-    return miss_data
+        missData[row][col] = np.nan
+    return missData
 def gene_missingdata_taxa_bias(rate,data,seed=0):
     #random.seed=seed
-    miss_data=data.copy()
-    nrow, ncol = miss_data.shape
+    missData=data.copy()
+    nrow, ncol = missData.shape
     choice_row=random.sample(list(np.linspace(0, nrow-1, nrow, dtype=int)),int(nrow*rate))
     for row in choice_row:
         choice_col=random.sample(list(np.linspace(0, ncol-1, ncol, dtype=int)),int(ncol*rate))
         for col in choice_col:
-            miss_data[row][col]=np.nan
-    return miss_data
+            missData[row][col]=np.nan
+    return missData
 def gene_missingdata_chara_bias(rate,data,seed=0):
     random.seed=seed
-    miss_data=data.copy()
-    nrow, ncol = miss_data.shape
+    missData=data.copy()
+    nrow, ncol = missData.shape
     choice_col = random.sample(list(np.linspace(0, ncol - 1, ncol, dtype=int)), int(ncol * rate))
     for col in choice_col:
         choice_row=random.sample(list(np.linspace(0, nrow-1, nrow, dtype=int)),int(nrow*rate))
         for row in choice_row:
-            miss_data[row][col]=np.nan
-    return miss_data
+            missData[row][col]=np.nan
+    return missData
 def gene_missingdata_block_bias(rate,data,seed=0):
     random.seed=seed
-    miss_data=data.copy()
-    nrow, ncol = miss_data.shape
+    missData=data.copy()
+    nrow, ncol = missData.shape
     rowlength=random.uniform(rate,1)
     collength=rate/rowlength
     rowlength=round(rowlength*nrow)
@@ -61,8 +61,8 @@ def gene_missingdata_block_bias(rate,data,seed=0):
     start_col=int(random.random()*ncol)
     for row in np.arange(0,rowlength):
         for col in np.arange(0,collength):
-            miss_data[(start_row+row)%nrow][(start_col+col)%ncol] = np.nan
-    return miss_data
+            missData[(start_row+row)%nrow][(start_col+col)%ncol] = np.nan
+    return missData
 
 def gene_missingdata_df(rate,data,seed=0):
     '''
@@ -72,39 +72,39 @@ def gene_missingdata_df(rate,data,seed=0):
     :return:缺失后数据集和缺失行数
     '''
     random.seed=seed
-    miss_data=data.copy()
-    nrow, ncol = miss_data.shape
+    missData=data.copy()
+    nrow, ncol = missData.shape
     myList = list(np.linspace(0, ncol*nrow-1, ncol*nrow, dtype=int))
     choice_num=random.sample(myList,int(ncol*nrow*rate))
     for num in choice_num:
         row=num%nrow
         col=num//nrow
-        miss_data.iloc[row,col] = np.nan
-    return miss_data
+        missData.iloc[row,col] = np.nan
+    return missData
 def gene_missingdata_taxa_bias_df(rate,data,seed=0):
     random.seed=seed
-    miss_data=data.copy()
-    nrow, ncol = miss_data.shape
+    missData=data.copy()
+    nrow, ncol = missData.shape
     choice_row=random.sample(list(np.linspace(0, nrow-1, nrow, dtype=int)),int(nrow*rate))
     for row in choice_row:
         choice_col=random.sample(list(np.linspace(0, ncol-1, ncol, dtype=int)),int(ncol*rate))
         for col in choice_col:
-            miss_data.iloc[row,col]=np.nan
-    return miss_data
+            missData.iloc[row,col]=np.nan
+    return missData
 def gene_missingdata_chara_bias_df(rate,data,seed=0):
     random.seed=seed
-    miss_data=data.copy()
-    nrow, ncol = miss_data.shape
+    missData=data.copy()
+    nrow, ncol = missData.shape
     choice_col = random.sample(list(np.linspace(0, ncol - 1, ncol, dtype=int)), int(ncol * rate))
     for row in choice_col:
         choice_row=random.sample(list(np.linspace(0, nrow-1, nrow, dtype=int)),int(nrow*rate))
         for col in choice_row:
-            miss_data.iloc[row,col]=np.nan
-    return miss_data
+            missData.iloc[row,col]=np.nan
+    return missData
 def gene_missingdata_block_bias_df(rate,data,seed=0):
     random.seed=seed
-    miss_data=data.copy()
-    nrow, ncol = miss_data.shape
+    missData=data.copy()
+    nrow, ncol = missData.shape
     rowlength=random.uniform(rate,1)
     collength=rate/rowlength
     rowlength=round(rowlength*nrow)
@@ -113,8 +113,8 @@ def gene_missingdata_block_bias_df(rate,data,seed=0):
     start_col=int(random.random()*ncol)
     for row in np.arange(0,rowlength):
         for col in np.arange(0,collength):
-            miss_data.iloc[(start_row+row)%nrow,(start_col+col)%ncol] = np.nan
-    return miss_data
+            missData.iloc[(start_row+row)%nrow,(start_col+col)%ncol] = np.nan
+    return missData
 def readDataAndSplit(path):
     csvdata = pd.read_excel(path,header=None)
     dt = csvdata.values

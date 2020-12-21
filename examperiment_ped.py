@@ -40,49 +40,49 @@ if __name__=="__main__":
                     # file='02Bennett94pterosaurs'
 
                 # file='Liu2011'
-                # origin_data,miss_mask,speciesName=readNex(r'C:\Users\pro\Desktop\all_nex_data\{}.nex'.format(file))
-                    origin_data, miss_mask, speciesName,begin,end = readNex(os.path.join(filePath,'{}.tnt'.format(file)))
-                    miss_data, miss_mask = gene_missingdata(rate=i, data=origin_data)
+                # originData,miss_mask,speciesName=readNex(r'C:\Users\pro\Desktop\all_nex_data\{}.nex'.format(file))
+                    originData, miss_mask, speciesName,begin,end = readNex(os.path.join(filePath,'{}.tnt'.format(file)))
+                    missData, miss_mask = gene_missingdata(rate=i, data=originData)
 
 
 
                     try:
                         min_max_scaler = preprocessing.MinMaxScaler()
-                        data = min_max_scaler.fit_transform(miss_data)
+                        data = min_max_scaler.fit_transform(missData)
                         miss_location = get_miss_location(data[miss_mask])
                         modelName = file+str(i)
                         inp = interpolation(modelName=modelName, completeData=np.delete(data, miss_mask, axis=0))
                         if not os.path.exists(os.path.join(modelSavePath,'{}.pkl'.format(modelName))):
                             inp.fit(os.path.join(modelSavePath,'{}.pkl'.format(modelName)))
                         pred_data, fix_data = inp.prd(data[miss_mask],model=os.path.join(modelSavePath,'{}.pkl'.format(modelName)))
-                        s=np.unique(np.delete(miss_data,miss_mask,axis=0))
+                        s=np.unique(np.delete(missData,miss_mask,axis=0))
                         inv_auto_data=min_max_scaler.inverse_transform(fix_data)
                         inv_auto_data=modifier(inv_auto_data,s)
-                        fix_auto_data=miss_data.copy()
+                        fix_auto_data=missData.copy()
                         fix_auto_data[miss_mask]=inv_auto_data
                         fix_auto_data=fix_auto_data.astype(int)
                         saveData(fileSavePath,'{}_{}_auto.tnt'.format(file,str(i/2)),speciesName,fix_auto_data,begin,end)
-                        saveData(fileSavePath,'{}_{}_missdata.tnt'.format(file, str(i / 2)), speciesName, miss_data, begin, end)
+                        saveData(fileSavePath,'{}_{}_missdata.tnt'.format(file, str(i / 2)), speciesName, missData, begin, end)
                         try:
-                            X_filled_knn = KNN(k=3).fit_transform(miss_data)
+                            X_filled_knn = KNN(k=3).fit_transform(missData)
                             X_filled_knn = X_filled_knn.astype(int)
                             saveData(fileSavePath,'{}_{}_knn.tnt'.format(file, str(i / 2)), speciesName, X_filled_knn, begin, end)
                         except Exception as e:
                             print(e)
                         try:
-                            X_filled_ii = IterativeImputer().fit_transform(miss_data)
+                            X_filled_ii = IterativeImputer().fit_transform(missData)
                             X_filled_ii = X_filled_ii.astype(int)
                             saveData(fileSavePath,'{}_{}_ii.tnt'.format(file, str(i / 2)), speciesName, X_filled_ii, begin, end)
                         except Exception as e:
                             print(e)
                         try:
-                            X_filled_sf = SimpleFill().fit_transform(miss_data)
+                            X_filled_sf = SimpleFill().fit_transform(missData)
                             X_filled_sf = X_filled_sf.astype(int)
                             saveData(fileSavePath,'{}_{}_sf.tnt'.format(file, str(i / 2)), speciesName, X_filled_sf, begin, end)
                         except Exception as e:
                             print(e)
                         try:
-                            X_filled_me = SimpleFill("median").fit_transform(miss_data)
+                            X_filled_me = SimpleFill("median").fit_transform(missData)
                             X_filled_me = X_filled_me.astype(int)
                             saveData(fileSavePath,'{}_{}_me.tnt'.format(file, str(i / 2)), speciesName, X_filled_me, begin, end)
                         except Exception as e:
@@ -90,7 +90,7 @@ if __name__=="__main__":
                     except Exception as e :
                         logger.info(e)
                 # with  open(os.path.join(fileSavePath,'{}_auto.txt'.format(file)), 'w') as f:
-                #     temp=list(origin_data)
+                #     temp=list(originData)
                 #     for i in range(len(temp)):
                 #         temp[i]=['-' if x==-1 else str(x) for x in temp[i]]
                 #         temp[i]=speciesName[i]+' '+''.join(temp[i])

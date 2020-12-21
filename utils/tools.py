@@ -4,9 +4,9 @@
 
 import numpy as np
 from pandas import isnull
-
+from matplotlib import pyplot as plt
 from utils.normalizer import NORMALIZERS,RECOVER
-
+import json
 
 
 class Solver(object):
@@ -285,3 +285,33 @@ def generate_noise(n_rows, n_cols):
     generate noise matrix
     """
     return np.random.uniform(0., 1., size=[n_rows, n_cols])
+
+
+
+#结果数据格式整理
+def addResult(result,missRate,missPattern,imputationMethod,RMSE,MAE,MAPE):
+    name="{}:{}".format(missPattern,imputationMethod)
+    if name  not in result.keys():
+        result[name]=[]
+    result[name].append([RMSE,MAE,MAPE])
+    return result
+
+# 结果绘图
+def plotResult(result):
+    plt.figure()
+    color = ['blue',  'red', 'green','yellow', 'black', 'burlywood', 'cadetblue', 'chartreuse', 'purple', 'coral',
+             'aqua', 'aquamarine', 'darkblue', 'y','m','bisque','g','peru','pink','c',
+             'snow','darkred']
+    x = [0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    colorIndex=0
+    for  patternMethod in result.keys():
+        RMSE=[i[0] for i in result[patternMethod]]
+        plt.plot(x, RMSE, color=color[colorIndex], label='{}'.format(patternMethod.split(":")[1]))
+        plt.legend()
+        colorIndex+=1
+    plt.show()
+
+def saveJson(jsonData,fileName):
+
+    with open("../result/{}".format(fileName),'w') as f:
+        json.dump(jsonData,f)

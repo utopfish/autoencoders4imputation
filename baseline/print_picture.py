@@ -25,7 +25,7 @@ for file in os.listdir(path):
     data = pd.read_excel(os.path.join(path, file), sheet_name="dataset")
     dt = np.array(data.values)
     data = dt.astype('float')
-    origin_data = data[:, :-1]
+    originData = data[:, :-1]
     target = data[:, -1]
     knn_rmse = []
     mice_rmse = []
@@ -43,105 +43,105 @@ for file in os.listdir(path):
     mida_rmse = []
     gain_rmse = []
     for i in [0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
-        miss_data = gene_missingdata(rate=i, data=origin_data)
+        missData = gene_missingdata(rate=i, data=originData)
         try:
-            imputed_data = knnimput.KNN(k=3).complete(miss_data)
-            score = evaluate.RMSE(origin_data, imputed_data)
+            imputedData = knnimput.KNN(k=3).complete(missData)
+            score = evaluate.RMSE(originData, imputedData)
             knn_rmse.append(score)
             logger.info("knn missing rate:{},RMSE:{}".format(i, score))
         except:
             knn_rmse.append(np.nan)
         try:
-            imputed_data = mice.MICE().complete(miss_data)
-            score = evaluate.RMSE(origin_data, imputed_data)
+            imputedData = mice.MICE().complete(missData)
+            score = evaluate.RMSE(originData, imputedData)
             mice_rmse.append(score)
             logger.info("MICE missing rate:{},RMSE:{}".format(i, score))
         except:
             mice_rmse.append(np.nan)
         try:
-            imputed_data = EM().complete(miss_data)
-            score = evaluate.RMSE(origin_data, imputed_data)
+            imputedData = EM().complete(missData)
+            score = evaluate.RMSE(originData, imputedData)
             em_rmse.append(score)
             logger.info("EM missing rate:{},RMSE:{}".format(i, score))
         except:
             em_rmse.append(np.nan)
         try:
-            imputed_data = BiScaler().fit_transform(miss_data)
-            imputed_data = SoftImpute().fit_transform(imputed_data)
-            score = evaluate.RMSE(origin_data, imputed_data)
+            imputedData = BiScaler().fit_transform(missData)
+            imputedData = SoftImpute().fit_transform(imputedData)
+            score = evaluate.RMSE(originData, imputedData)
             fi_bs_rmse.append(score)
             logger.info("fi BiScaler  missing rate:{},RMSE:{}".format(i, score))
         except:
             fi_bs_rmse.append(np.nan)
         try:
-            imputed_data = SoftImpute().fit_transform(miss_data)
-            score = evaluate.RMSE(origin_data, imputed_data)
+            imputedData = SoftImpute().fit_transform(missData)
+            score = evaluate.RMSE(originData, imputedData)
             fi_si_rmse.append(score)
             logger.info("fi SoftImpute missing rate:{},RMSE:{}".format(i, score))
         except:
             fi_si_rmse.append(np.nan)
         try:
-            imputed_data = IterativeImputer().fit_transform(miss_data)
-            score = evaluate.RMSE(origin_data, imputed_data)
+            imputedData = IterativeImputer().fit_transform(missData)
+            score = evaluate.RMSE(originData, imputedData)
             fi_ii_rmse.append(score)
             logger.info("fi IterativeImputer missing rate:{},RMSE:{}".format(i, score))
         except:
             fi_ii_rmse.append(np.nan)
 
         try:
-            imputed_data = SimpleFill().fit_transform(miss_data)
-            score = evaluate.RMSE(origin_data, imputed_data)
+            imputedData = SimpleFill().fit_transform(missData)
+            score = evaluate.RMSE(originData, imputedData)
             fi_sf_rmse.append(score)
             logger.info("fi SimpleFill missing rate:{},RMSE:{}".format(i, score))
         except:
             fi_sf_rmse.append(np.nan)
         try:
-            imputed_data = SimpleFill("median").fit_transform(miss_data)
-            score = evaluate.RMSE(origin_data, imputed_data)
+            imputedData = SimpleFill("median").fit_transform(missData)
+            score = evaluate.RMSE(originData, imputedData)
             fi_median_rmse.append(score)
             logger.info("fi median missing rate:{},RMSE:{}".format(i, score))
         except:
             fi_median_rmse.append(np.nan)
         try:
-            imputed_data = impyute.imputation.cs.random(miss_data)
-            score = evaluate.RMSE(origin_data, imputed_data)
+            imputedData = impyute.imputation.cs.random(missData)
+            score = evaluate.RMSE(originData, imputedData)
             random_rmse.append(score)
             logger.info("random missing rate:{},RMSE:{}".format(i, score))
         except:
             random_rmse.append(np.nan)
 
         try:
-            imputed_data = impyute.imputation.cs.mean(miss_data)
-            score = evaluate.RMSE(origin_data, imputed_data)
+            imputedData = impyute.imputation.cs.mean(missData)
+            score = evaluate.RMSE(originData, imputedData)
             mean_rmse.append(score)
             logger.info("mean missing rate:{},RMSE:{}".format(i, score))
         except:
             mean_rmse.append(np.nan)
         try:
-            imputed_data = impyute.imputation.cs.mode(miss_data)
-            score = evaluate.RMSE(origin_data, imputed_data)
+            imputedData = impyute.imputation.cs.mode(missData)
+            score = evaluate.RMSE(originData, imputedData)
             mode_rmse.append(score)
             logger.info("mode missing rate:{},RMSE:{}".format(i, score))
         except:
             mode_rmse.append(np.nan)
         try:
-            imputed_data = impyute.imputation.cs.median(miss_data)
-            score = evaluate.RMSE(origin_data, imputed_data)
+            imputedData = impyute.imputation.cs.median(missData)
+            score = evaluate.RMSE(originData, imputedData)
             median_rmse.append(score)
             logger.info("median missing rate:{},RMSE:{}".format(i, score))
         except:
             median_rmse.append(np.nan)
         try:
-            imputed_data = MIDA().complete(miss_data)
-            score = evaluate.RMSE(origin_data, imputed_data)
+            imputedData = MIDA().complete(missData)
+            score = evaluate.RMSE(originData, imputedData)
             logger.info("MIDA missing rate:{},RMSE:{}".format(i, score))
             mida_rmse.append(score)
         except:
             mida_rmse.append(np.nan)
 
         try:
-            imputed_data = GAIN().complete(miss_data)
-            score = evaluate.RMSE(origin_data, imputed_data)
+            imputedData = GAIN().complete(missData)
+            score = evaluate.RMSE(originData, imputedData)
             logger.info("MIDA missing rate:{},RMSE:{}".format(i, score))
             gain_rmse.append(score)
         except:

@@ -49,7 +49,7 @@ def to_img(x):
 
 def plot_reconstructions(model, save=True, name=None, conv=False, simple=False):
     """
-    Plot 10 reconstructions from the test set. The top row is the original
+    Plot 10 reconstructions from the baseline set. The top row is the original
     digits, the bottom is the decoder reconstruction.
     """
     # encode then decode
