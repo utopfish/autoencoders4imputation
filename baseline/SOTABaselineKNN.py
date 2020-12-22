@@ -42,11 +42,12 @@ def imputeMethodKNN(result, originData, missData, missRate, missPattern,dataType
                            masked_mape_np(originData, imputedData))
     except Exception as e:
         print(e)
+        imputedData = 'none'
         result = addResult(result, missRate, missPattern, imputationMethod,
                            np.inf,
                            np.inf,
                            np.inf)
-    return result
+    return result,imputedData
 
 def imputeMethod2(result, originData, missData, missRate, missPattern):
     imputationMethod = "ycimpute KNN"

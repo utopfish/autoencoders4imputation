@@ -22,7 +22,9 @@ from utils.handle_missingdata import gene_missingdata, gene_missingdata_taxa_bia
 
 
 
+from utils.wapper import costTime
 
+@costTime
 def imputeMethodGAIN(result,originData,missData,missRate,missPattern,dataType='continuous'):
     imputationMethod = "GAIN"
     try:
@@ -37,11 +39,12 @@ def imputeMethodGAIN(result,originData,missData,missRate,missPattern,dataType='c
                            masked_mape_np(originData, imputedData))
     except Exception as e:
         print(e)
+        imputedData='none'
         result = addResult(result, missRate, missPattern, imputationMethod,
                            np.inf,
                            np.inf,
                            np.inf)
-    return result
+    return result,imputedData
 
 
 
@@ -66,6 +69,6 @@ if __name__=="__main__":
             else:
                 raise Exception("缺失模式错误，请在'normal','taxa','chara','block'中选择对应模式")
 
-            result=imputeMethod(result, originData, missData, missRate, missPattern)
+            result=imputeMethodGAIN(result, originData, missData, missRate, missPattern)
 
     plotResult(result)

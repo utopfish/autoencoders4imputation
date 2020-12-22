@@ -313,5 +313,5 @@ def plotResult(result):
 
 def saveJson(jsonData,fileName):
 
-    with open("../result/{}".format(fileName),'w') as f:
+    with open("{}".format(fileName),'w') as f:
         json.dump(jsonData,f)

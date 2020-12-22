@@ -11,6 +11,9 @@ import numpy as np
 import xlrd
 import xlwt
 from xlutils.copy import copy
+import os
+import impyute
+from logger import logger
 def readNex(path):
     info=[]
     speciesname=[]
@@ -53,7 +56,10 @@ def readNex(path):
             misss_row.append(ind)
             continue
     return np.array(data,dtype=float),misss_row,speciesname,begin,end
-import os
+
+
+
+
 def saveData(fileSavePath,fileName,speciesName,data,begin,end):
     with  open(os.path.join(fileSavePath, fileName), 'w') as f:
         temp = list(data)
@@ -416,11 +422,61 @@ def Liu2011():
     print('knn', knn)
     print('me', me)
     print('sf', sf)
+
+def readAllTypeFile(file):
+    if file.endswith('.xlsx'):
+        try:
+            data = pd.read_excel(file, sheet_name="dataset")
+            dt = np.array(data.values)
+            data = dt.astype('float')
+            originData = data[:-1]
+            target = data[-1]
+            return originData
+        except Exception as e:
+            print(e)
+            logger.error("文件读取错误：{}".format(file))
+            return None
+    elif file.endswith('.nex'):
+        try:
+            data, misss_row, speciesname, begin, end = readNex(file)
+            # 之后进行测试是否需要在原数基础上+1 或+10
+            data = data
+            originData = impyute.imputation.cs.random(data)
+            return originData
+        except ValueError:
+            print("可能存在数据多态问题")
+            # shear_dile(os.path.join(path, file), os.path.join("G:\labWork\cladistic-data-master\可能无用数据"))
+            print("文件移动成功")
+            return None
+    elif file.endswith('.data'):
+        try:
+            dataset = pd.read_csv(file)
+            data = np.array(dataset.T)
+            originData = data[:-1]
+            target = data[-1]
+            return originData
+        except Exception as e:
+            print(e)
+            return None
+    elif file.endswith('.csv'):
+        data = pd.read_csv(file)
+        dt = np.array(data.values)
+        data = dt.astype('float')
+        originData = data[:-1]
+        target = data[-1]
+        return originData
 if __name__=="__main__":
     # Aria2015_rf()
     # Aria2015_co()
     # Longrich2010()
     # Dikow2009()
     # Liu2011()
-    path=r'E:\labCode\autoencoders4imputation\logs\2020-08-07-13h.log'
-    read_result_log2(path,'tai_tresai_test02.csv')
+    # path=r'E:\labCode\autoencoders4imputation\logs\2020-08-07-13h.log'
+    # read_result_log2(path,'tai_tresai_test02.csv')
+    path='../public_data'
+    for file in os.listdir(path):
+        print(file)
+        data=readAllTypeFile(os.path.join(path,file))
+        # if data==None:
+        #     print(file)
+        # print(data)

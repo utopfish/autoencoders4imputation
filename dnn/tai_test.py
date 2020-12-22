@@ -44,6 +44,7 @@ class TAI(Solver):
             first_imputation_method='ii',
             learning_rate=0.001,
             loss='MSELoss',
+            firstImputedData='None',
             Autoencoder_method='Autoencoder',
             verbose=True):
 
@@ -60,6 +61,7 @@ class TAI(Solver):
         self.early_stop = early_stop
         self.learning_rate=learning_rate
         self.loss=loss
+        self.firstImputedData=firstImputedData
         self.Autoencoder_method=Autoencoder_method
         self.first_imputation_method=first_imputation_method
 
@@ -139,6 +141,8 @@ class TAI(Solver):
         model.eval()
         if self.first_imputation_method=="None":
             pred_data =self.fill(X.copy(), missing_mask, 'zero')
+        elif self.firstImputedData!='None':
+            pred_data= self.ss.transform(self.firstImputedData)
         else:
             pred_data = imputation[self.first_imputation_method](X)
         filled_data =self.revise(data=pred_data.copy(),model=model,missing_mask=missing_mask)
@@ -160,14 +164,14 @@ class TAI(Solver):
 
         x_zero_replaced = self.fill(x.copy(),missing_mask,'zero')
         if self.normalizer is not None:
-            ss = StandardScaler()
-            x_zero_replaced=ss.fit_transform(x_zero_replaced)
+            self.ss = StandardScaler()
+            x_zero_replaced=self.ss.fit_transform(x_zero_replaced)
             # normalizer = NORMALIZERS[self.normalizer]
             # x_zero_replaced, min_record, max_record = normalizer(x_zero_replaced)
         x_zero_replaced[missing_mask]=np.nan
         x_filled,first_filled = self.solve(x_zero_replaced,missing_mask)
-        x_filled = ss.inverse_transform(x_filled)
-        first_filled= ss.inverse_transform(first_filled)
+        x_filled = self.ss.inverse_transform(x_filled)
+        first_filled= self.ss.inverse_transform(first_filled)
         return x_filled,first_filled
 
 if __name__=="__main__":
