@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 @Project : autoencoders4imputation
-@File    : baseline_ped.py
+@File    : allPedData.py
 @Author  : Mr.Liu Meng
 @E-mail  : utopfish@163.com
-@Time    : 2020/12/21 21:50
+@Time    : 2020/12/22 12:17
 """
 import os
 
@@ -84,5 +84,4 @@ if __name__=="__main__":
                             logger.info("训练耗时:{}".format(time.time() - start))
             saveJson(result,
                      "{}_{}_{}_{}.json".format("allmethod",missPattern, file.split("/")[-1], datetime.datetime.now().strftime('%Y%m%d-%H%M%S')))
-            plotResult(result)
-        break
+            #plotResult(result)
