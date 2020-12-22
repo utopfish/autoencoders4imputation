@@ -35,6 +35,7 @@ if __name__=="__main__":
     target = data[-1]
     result = {}
     for missPattern in ['normal']:
+    #for missPattern in ['normal', 'block', 'taxa', 'chara']
         for missRate in [0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
             if missPattern == 'normal':
                 missData = gene_missingdata(rate=missRate, data=originData)
