@@ -29,16 +29,21 @@ from utils.handle_missingdata import gene_missingdata, gene_missingdata_taxa_bia
     gene_missingdata_block_bias
 import os
 if __name__=="__main__":
-    path = r'public_data'
-
+    path = r'../public_data'
+    savePath=r'../result'
     for file in os.listdir(path):
-        data = pd.read_excel(os.path.join(path,file), sheet_name="dataset")
+        try:
+            data = pd.read_excel(os.path.join(path,file), sheet_name="dataset")
+        except Exception as e:
+            print(e)
+            logger.error("文件读取错误：{}".format(file))
+            continue
         dt = np.array(data.values)
         data = dt.astype('float')
         originData = data[:-1]
         target = data[-1]
         result = {}
-        for missPattern in ['normal', 'block', 'taxa', 'chara']:
+        for missPattern in ['normal']:
         # for missPattern in ['normal']:
             for missRate in [0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
                 if missPattern == 'normal':
@@ -71,5 +76,4 @@ if __name__=="__main__":
 
                             logger.info("训练耗时:{}".format(time.time() - start))
             saveJson(result, "{}_{}_{}_{}.json".format("allMethod", missPattern,file, datetime.datetime.now().strftime('%Y%m%d-%H%M%S')))
-            plotResult(result)
-        break
+            #plotResult(result)

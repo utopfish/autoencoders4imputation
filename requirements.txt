@@ -12,7 +12,6 @@ fancyimpute
 torch
 xlwt
 xlutils
-impyute
 prettytable
 loguru
 ycimpute
