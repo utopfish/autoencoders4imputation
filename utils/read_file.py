@@ -423,6 +423,7 @@ def Liu2011():
     print('me', me)
     print('sf', sf)
 
+## 将所有文件读取方式整合
 def readAllTypeFile(file):
     if file.endswith('.xlsx'):
         try:
@@ -450,7 +451,7 @@ def readAllTypeFile(file):
             return None
     elif file.endswith('.data'):
         try:
-            dataset = pd.read_csv(file)
+            dataset = pd.read_csv(file,sep='\s+')
             data = np.array(dataset.T)
             originData = data[:-1]
             target = data[-1]

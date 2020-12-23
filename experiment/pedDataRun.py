@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 @Project : autoencoders4imputation
-@File    : allPedData.py
+@File    : pedDataRun.py
 @Author  : Mr.Liu Meng
 @E-mail  : utopfish@163.com
 @Time    : 2020/12/22 12:17
