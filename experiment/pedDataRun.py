@@ -30,8 +30,8 @@ from utils.read_file import readAllTypeFile
 from utils.handle_missingdata import gene_missingdata, gene_missingdata_taxa_bias, gene_missingdata_chara_bias, \
     gene_missingdata_block_bias
 
-def mainWork():
-    path = r'../nexus_files'
+def mainWork(path,savePath):
+
     for file in os.listdir(path):
         originData = readAllTypeFile(os.path.join(path, file))
         for missPattern in ['normal']:
@@ -78,9 +78,11 @@ def mainWork():
                             logger.info(
                                 "改后{}-{}-{}训练耗时:{}".format(firstImputedMethod, loss, autoMethod, time.time() - start))
             saveJson(result,
-                     "{}_{}_{}_{}.json".format("allmethod", missPattern, file,
-                                               datetime.datetime.now().strftime('%Y%m%d-%H%M%S')))
+                     os.path.join(savePath,"{}_{}_{}_{}.json".format("allmethod", missPattern, file,
+                                               datetime.datetime.now().strftime('%Y%m%d-%H%M%S'))))
             # plotResult(result)
 if __name__=="__main__":
+    path = r'../nexus_files'
+    savePath = r'../experiment/publicData'
     for _ in range(3):
-        mainWork()
+        mainWork(path,savePath)

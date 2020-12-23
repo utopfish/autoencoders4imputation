@@ -6,12 +6,12 @@
 @E-mail  : utopfish@163.com
 @Time    : 2020/12/21 22:39
 """
-
+from logger import logger
 import time
 def costTime(func):
     def wapper(*args, **kwargs):
         start=time.time()
         tmp=func(*args, **kwargs)
-        print("{}：耗时{}".format(func.__name__,str(time.time()-start)))
+        logger.info("{}：耗时{}".format(func.__name__,str(time.time()-start)))
         return tmp
     return wapper
