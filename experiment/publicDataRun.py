@@ -21,7 +21,7 @@ from baseline.SOTABaselineMIDA import  imputeMethodMIDA as MIDA
 from baseline.SOTABaselineEM import  imputeMethodEM as EM
 from baseline.SOTABaselineMICE import  imputeMethodMICE as MICE
 from baseline.SOTABaselineRandom import  imputeMethodRandom as Random
-
+from baseline.SOTABaselineRF import imputeMethodMR as MR
 from baseline.myMethodTest import imputeMethod as TAI
 
 from utils.tools import saveJson
@@ -32,11 +32,10 @@ import os
 import tqdm
 
 def mainWork(path,savePath):
-
     pbar = tqdm.tqdm(os.listdir(path), desc='dirs')
     for file in pbar:
         pbar.set_description("Processing %s" % file)
-        if file.endswith('data'):
+        if file.endswith('xlsx') or file.endswith('csv'):
             originData = readAllTypeFile(os.path.join(path, file))
             for missPattern in ['normal']:
             # for missPattern in ['normal','block',  'taxa', 'chara']:
@@ -55,23 +54,26 @@ def mainWork(path,savePath):
 
                     result,_ = Random(result, originData, missData, missRate, missPattern)
                     result,_ = Medain(result, originData, missData, missRate, missPattern)
-                    result,_ = KNN(result, originData, missData, missRate, missPattern)
+                    result,KNNImputedData = KNN(result, originData, missData, missRate, missPattern)
                     result,_ = EM(result, originData, missData, missRate, missPattern)
                     result,IImputedData = II(result, originData, missData, missRate, missPattern)
                     result,_ = GAIN(result, originData, missData, missRate, missPattern)
+                    result, MRImputedData = MR(result, originData, missData, missRate, missPattern)
                     result,_ = MIDA(result, originData, missData, missRate, missPattern)
                     result, MICEImputedData = MICE(result, originData, missData, missRate, missPattern)
-                    for firstImputedMethod in ['ii', 'mice']:
+                    for firstImputedMethod in ['mice']:
                         if firstImputedMethod=='ii':
                             firstImputedData=IImputedData
                         elif firstImputedMethod=='mice':
                             firstImputedData  = MICEImputedData
+                        elif firstImputedMethod =='knn':
+                            firstImputedData=KNNImputedData
                         for loss in ['MSELoss']:
-                            # for autoMethod in ['Autoencoder','ResAutoencoder','StockedAutoencoder','StockedResAutoencoder']:
+                            #for autoMethod in ['Autoencoder','ResAutoencoder','StockedAutoencoder','StockedResAutoencoder']:
                             for autoMethod in ['Autoencoder']:
                                 start=time.time()
                                 result=TAI(result=result,firstImputedMethod=firstImputedMethod,
-                                                    firstImputedData=firstImputedData.copy(),
+                                                    firstImputedData=firstImputedData,
                                                     loss=loss,autoMethod=autoMethod,
                                                     originData=originData,missData=missData,
                                                     missRate=missRate,missPattern=missPattern)
@@ -81,7 +83,7 @@ def mainWork(path,savePath):
 
 if __name__=="__main__":
     path = r'../public_data'
-    savePath=r'../experiment/publicData'
-    for _ in range(3):
+    savePath=r'../experiment/addRM'
+    for _ in range(5):
         mainWork(path,savePath)
 

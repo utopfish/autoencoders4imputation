@@ -125,17 +125,25 @@ def main():
                 readTre2mouse(treeSpecies, speciesName, SvaetreeSpecies)
         except Exception as e:
             print(e)
+
 if __name__=="__main__":
     # main()
     # dirtyhand()
-    filePath=r'C:\Users\pro\Desktop\usefulDataSimple\07tre'
-    nexfile='07LiaoEA10Rasborafish.nex'
-    originData, miss_mask, speciesName, begin, end = readNex(os.path.join(filePath, nexfile))
-    for file in os.listdir(filePath):
-        if file.endswith('tre'):
-            treeSpecies = os.path.join(filePath, file)
-            SvaetreeSpecies=os.path.join(filePath,file[:-3]+'txt')
-            readTre2mouse(treeSpecies, speciesName, SvaetreeSpecies)
+    # filePath=r'C:\Users\pro\Desktop\usefulDataSimple\07tre'
+    # nexfile='07LiaoEA10Rasborafish.nex'
+    # originData, miss_mask, speciesName, begin, end = readNex(os.path.join(filePath, nexfile))
+    # for file in os.listdir(filePath):
+    #     if file.endswith('tre'):
+    #         treeSpecies = os.path.join(filePath, file)
+    #         SvaetreeSpecies=os.path.join(filePath,file[:-3]+'txt')
+    #         readTre2mouse(treeSpecies, speciesName, SvaetreeSpecies)
     #readTreeSpecies(treeSpecies,speciesName)
     # count = Counter("(Bombylius_major,((Apsilocephala_longistyla,(Prorates_sp_Escalante,(Phycus_frommeri,Hemigephyra_atra))),((Apiocera_painteri,((Opomydas_townsendi,Mydas_clavatus),(Mitrodetus_dentitarsis,(Nemomydas_brachyrhynchus,Afroleptomydas_sp_Clanwilliam)))),((Rhipidocephala_sp_HaroldJohnson,(Holcocephala_calva,Holcocephala_abdominalis)),((Perasis_transvaalensis,(Laphystia_tolandi,(Trichardis_effrena,(Nusa_infumata,((Laxenecera_albicincta,Hoplistomerus_nobilis),((Pilica_formidolosa,(Cerotainia_albipilosa,Atomosia_puella)),((Stiphrolamyra_angularis,Lamyra_gulo),(Laphria_aktis,Choerades_bella)))))))),((((Damalis_monochaetes,Damalis_annulata),(Rhabdogaster_pedion,Acnephalum_cylindricum)),(((Pegesimallus_laticornis,(Diogmites_grossus,(Plesiomma_sp_Guanacaste,(Dasypogon_diadema,(Saropogon_luteus,Lestomyia_fraudiger))))),((Trichoura_sp_Tierberg,Ablautus_coquilletti),(Molobratia_teutonus,(Nicocles_politus,(Leptarthrus_brevirostris,(Cyrtopogon_rattus,Ceraturgus_fasciatus)))))),((Willistonina_bilineata,(Eudioctria_albius,(Dioctria_hyalipennis,(Dioctria_rufipes,Dioctria_atricapillus)))),((Gonioscelis_ventralis,(Stenopogon_rufibarbis,Ospriocerus_aeacus)),((Tillobroma_punctipennis,(Prolepsis_tristis,Microstylum_sp_Karkloof)),(Lycostommyia_albifacies,(Scylaticus_costalis,Connomyia_varipennis))))))),(((Lasiopogon_cinctus,Lasiopogon_aldrichii),(Stichopogon_punctum,(Stichopogon_trifasciatus,Stichopogon_elegantulus))),(((Euscelidia_pulchra,Beameromyia_bifida),((Leptogaster_cylindrica,Leptogaster_arida),(Tipulogaster_glabrata,Lasiocnemus_lugens))),(((Emphysomera_pallidapex,Emphysomera_conopsoides),(Ommatius_tibialis,Afroestricus_chiastoneurus)),((Proctacanthus_philadelphicus,Pogonioefferia_pogonias),((Philodicus_tenuipes,(Promachus_amastrus,Megaphorus_pulchrus)),((Neolophonotus_bimaculatus,Dasophrys_crenulatus),(Neoitamus_cyanurus,(Clephydroneura_sp_Kepong,(Dysmachus_trigonus,(Philonicus_albiceps,(Machimus_occidentalis,(Tolmerus_atricapillus,(Asilus_sericeus,Asilus_crabroniformis)))))))))))))))))))")
     # print(count)
+    originFilePath=r'C:\Users\pro\Desktop\imptuedData2RF\01\01_Aguado2009.nex'
+
+    treFilePath=r'C:\Users\pro\Desktop\Aguado2009_200树\原始数据\0.5_03_Dikow2009_tnt.tre'
+    treeSpaceFile=r'C:\Users\pro\Desktop\Aguado2009_200树\0.5_01_Aguado2009_tnt.txt'
+
+    originData, miss_mask, speciesName, begin, end = readNex(originFilePath)
+    readTre2mouse(treFilePath, speciesName, treeSpaceFile)

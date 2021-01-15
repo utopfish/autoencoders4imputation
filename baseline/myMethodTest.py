@@ -28,7 +28,7 @@ from utils.read_file import readNex
 
 def imputeMethod(result,loss,firstImputedMethod,autoMethod,originData,missData,missRate,missPattern,dataType='continuous',firstImputedData="None"):
     isImputed= 'true' if firstImputedData!='None' else 'false'
-    imputationMethod =  "{}_{}_{}_{}".format(firstImputedMethod, loss, autoMethod,isImputed)
+    imputationMethod =  "{}_{}_{}".format(firstImputedMethod, loss, autoMethod,isImputed)
     try:
         imputedData, firstImputedData = TAI(first_imputation_method=firstImputedMethod,
                                             firstImputedData=firstImputedData,
@@ -50,7 +50,7 @@ def imputeMethod(result,loss,firstImputedMethod,autoMethod,originData,missData,m
                            MAE(originData, imputedData),
                            masked_mape_np(originData, imputedData))
 
-
+        return result, imputedData
     except Exception as e:
         print(e)
         result = addResult(result, missRate, missPattern, imputationMethod,
@@ -58,7 +58,7 @@ def imputeMethod(result,loss,firstImputedMethod,autoMethod,originData,missData,m
                            np.inf,
                            np.inf)
 
-    return result
+        return result,firstImputedData
 if __name__=="__main__":
     # path = r'../nexus_files'
     # for file in os.listdir(path):

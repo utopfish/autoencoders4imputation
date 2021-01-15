@@ -230,7 +230,24 @@ def read_result_log2(path,save_path):
                 csv_writer.writerow([i] +[resu[row]['pattern']]+temp)
     f.close()
 
+def lableEncoder(data):
+    """
+    对数据离散化
+    :param data:
+    :return:
+    """
 
+    df = pd.DataFrame(data)
+    from sklearn.preprocessing import LabelEncoder
+    for col in list(df):
+        le = LabelEncoder()
+        t=df[col]
+        df[col] = le.fit_transform(df[col])
+    for i in range(len(data)):
+        for j in range(len(data[0])):
+            if np.isnan(data[i][j]):
+                df.iloc[i,j]=np.nan
+    return np.array(df)
 def write_excel_xls(path, sheet_name, value):
     index = len(value)  # 获取需要写入数据的行数
     workbook = xlwt.Workbook()  # 新建一个工作簿
@@ -474,10 +491,14 @@ if __name__=="__main__":
     # Liu2011()
     # path=r'E:\labCode\autoencoders4imputation\logs\2020-08-07-13h.log'
     # read_result_log2(path,'tai_tresai_test02.csv')
-    path='../public_data'
-    for file in os.listdir(path):
-        print(file)
-        data=readAllTypeFile(os.path.join(path,file))
+    # path='../public_data'
+    # for file in os.listdir(path):
+    #     print(file)
+    #     data=readAllTypeFile(os.path.join(path,file))
         # if data==None:
         #     print(file)
         # print(data)
+    path=r'E:\labCode\cladistic-data-master\nexus_files\LiebermanEA97_Asteropyginae.nex'
+    data,misss_row,speciesname,begin,end=readNex(path)
+    data=lableEncoder(data)
+    print(data)
