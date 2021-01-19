@@ -23,7 +23,6 @@ from utils.normalizer import NORMALIZERS,RECOVER
 
 #baseline插补方法
 from ycimpute.imputer import  mice
-from ycimpute.utils import evaluate
 from utils.base_impute import random_inpute
 from fancyimpute import IterativeImputer, SimpleFill
 imputation = {'median':SimpleFill("median").fit_transform,'random':random_inpute,'mice':mice.MICE().complete,'ii':IterativeImputer().fit_transform}
@@ -32,6 +31,7 @@ LOSS={'MSELoss':torch.nn.MSELoss(),'CrossEntropyLoss':torch.nn.CrossEntropyLoss(
 
 
 class TAI(Solver):
+    #原始参数
     def __init__(
             self,
             theta=5,
@@ -47,7 +47,6 @@ class TAI(Solver):
             firstImputedData='None',
             Autoencoder_method='Autoencoder',
             verbose=True):
-
         Solver.__init__(
             self,
             normalizer=normalizer)
@@ -100,10 +99,11 @@ class TAI(Solver):
                     early_stop = True
                     break
                 if batch_idx % 50 == 0:
+                    print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+                        epoch, batch_idx * len(batch_data), len(train_loader.dataset),
+                               100. * batch_idx / len(train_loader), loss.item()))
                     pass
-                    # print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
-                    #     epoch, batch_idx * len(batch_data), len(train_loader.dataset),
-                    #            100. * batch_idx / len(train_loader), loss.item()))
+
                 cost_list.append(loss.item())
 
             if early_stop:

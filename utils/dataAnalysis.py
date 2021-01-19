@@ -6,7 +6,9 @@
 @E-mail  : utopfish@163.com
 @Time    : 2020/12/21 20:47
 """
-
+from xlwt import *
+import xlrd
+from xlutils.copy import copy
 import os
 from prettytable import PrettyTable
 import json
@@ -66,18 +68,21 @@ def analysisMean(file,result):
     #计算均值
     if file not in totalResult.keys():
         totalResult[file]={}
-    missRate = [0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    missRate = [0.05, 0.1, 0.2, 0.3, 0.4, 0.5]
     for patternMethod in result.keys():
-
+        t=result[patternMethod]
         for index, row in enumerate(result[patternMethod]):
-            if "{}:{:.2f}".format(patternMethod, missRate[index]) not in totalResult[file].keys():
-                totalResult[file]["{}:{:.2f}".format(patternMethod, missRate[index])]=[]
             try:
-                temp = ["{:.4f}".format(i) for i in row]
-            except:
-                temp = ['NaN' for _ in row]
+                if "{}:{:.2f}".format(patternMethod, missRate[index]) not in totalResult[file].keys():
+                    totalResult[file]["{}:{:.2f}".format(patternMethod, missRate[index])]=[]
+                try:
+                    temp = ["{:.4f}".format(i) for i in row]
+                except:
+                    temp = ['NaN' for _ in row]
 
-            totalResult[file]["{}:{:.2f}".format(patternMethod, missRate[index])].append(temp)
+                totalResult[file]["{}:{:.2f}".format(patternMethod, missRate[index])].append(temp)
+            except Exception as e:
+                print(e)
 def getMeanAndStd(data):
     data=data.astype(np.float64)
     std=np.std(data)
@@ -86,22 +91,23 @@ def getMeanAndStd(data):
 
 
 def analysisMeanMain(dataPath,savePath):
-    for missRate in [0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
+    for missRate in [0.05, 0.1, 0.2, 0.3, 0.4, 0.5]:
         for i in os.listdir(dataPath):
             if i.endswith('json'):
                 result=readJson(os.path.join(dataPath,i))
                 analysisMean("_".join(i.split('_')[:4]),result)
         x = PrettyTable(['dataSet','Method', 'pattern', 'missRate', 'RMSE', 'MAE', "MAPE"])
         matrixData=[[] for _ in range(3)]
+        methodName=[i.split(":")[1] for i in result.keys()]
         for i in range(3):
-            matrixData[i].append(['{}'.format(missRate),'Random',	'median',	'KNN',	'EM',	'IterativeImputer',	'GAIN',	'MIDA',	'MICE'	,'mice_MSELoss_Autoencoder'])
+            matrixData[i].append(['{}'.format(missRate)]+methodName)
         for datasetResult in totalResult:
             matrixDataTmp=[[datasetResult.split("_")[3]] for _ in range(3)]
             for missPatternMethodRate in totalResult[datasetResult]:
                 missDataImputedMisc = np.array(totalResult[datasetResult][missPatternMethodRate])
                 if float(missPatternMethodRate.split(":")[2])==missRate:
-                    # if  'MSELoss' not in missPatternMethodRate.split(":")[1] or \
-                    #         'mice_MSELoss_Autoencoder' == missPatternMethodRate.split(":")[1] :
+                    if  'MSELoss' not in missPatternMethodRate.split(":")[1] or \
+                            'mice_MSELoss_Autoencoder' == missPatternMethodRate.split(":")[1] :
                         tmp = []
                         for i in range(3):
                             M, S = getMeanAndStd(missDataImputedMisc[:, i])
@@ -110,49 +116,24 @@ def analysisMeanMain(dataPath,savePath):
                         x.add_row([datasetResult]+missPatternMethodRate.split(":")  + tmp)
             for i in range(3):
                 matrixData[i].append(matrixDataTmp[i])
+        if not os.path.exists(savePath):
+            os.makedirs(savePath)
         for i,loss in enumerate(['MSE','MAP','MAPE']):
             write_excel_xls(os.path.join(savePath,"{}.xls".format(loss)),"data",matrixData[i])
         print(x)
 
-def analysisMeanMain2(dataPath,savePath):
-    '''
-    
-    删除MICE,ii结果的输出
-    :param dataPath:
-    :param savePath:
+
+def json2Excel(filePath,ExcelPath):
+    """
+    将Json文件转为Excel文件
+    :param filePath:
+    :param ExcelPath:
     :return:
-    '''
-    for missRate in [0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
-        for i in os.listdir(dataPath):
-            if i.endswith('json'):
-                result=readJson(os.path.join(dataPath,i))
-                analysisMean("_".join(i.split('_')[:4]),result)
-        x = PrettyTable(['dataSet','Method', 'pattern', 'missRate', 'RMSE', 'MAE', "MAPE"])
-        matrixData=[[] for _ in range(3)]
-        for i in range(3):
-            matrixData[i].append(['{}'.format(missRate),'Random',	'median',	'KNN',	'EM','GAIN',	'MIDA'	,'mice_MSELoss_Autoencoder'])
-        for datasetResult in totalResult:
-            matrixDataTmp=[[datasetResult.split("_")[3]] for _ in range(3)]
-            for missPatternMethodRate in totalResult[datasetResult]:
-                if "MICE" not in missPatternMethodRate and "IterativeImputer" not in missPatternMethodRate:
-                    missDataImputedMisc = np.array(totalResult[datasetResult][missPatternMethodRate])
-                    if float(missPatternMethodRate.split(":")[2])==missRate:
-                        if  'MSELoss' not in missPatternMethodRate.split(":")[1] or \
-                                'mice_MSELoss_Autoencoder' == missPatternMethodRate.split(":")[1] :
-                            tmp = []
-                            for i in range(3):
-                                M, S = getMeanAndStd(missDataImputedMisc[:, i])
-                                tmp.append("{:.3f}+{:.3f}".format(M, S))
-                                matrixDataTmp[i].append("{:.3f}+{:.3f}".format(M, S))
-                            x.add_row([datasetResult]+missPatternMethodRate.split(":")  + tmp)
-            for i in range(3):
-                matrixData[i].append(matrixDataTmp[i])
-        for i,loss in enumerate(['MSE','MAP','MAPE']):
-            write_excel_xls(os.path.join(savePath,"{}.xls".format(loss)),"data",matrixData[i])
-        print(x)
-from xlwt import *
-import xlrd
-from xlutils.copy import copy
+    """
+    for i in os.listdir(filePath):
+        if i.endswith('json'):
+            result = readJson(os.path.join(filePath, i))
+            print(result)
 def write_excel_xls(path, sheet_name, value):
     index = len(value)  # 获取需要写入数据的行数
     if os.path.exists(path):
@@ -211,14 +192,9 @@ def analysisPlot(dataPath,savePath):
             write_excel_xls(os.path.join(savePath,"{}.xls".format(loss)),"data",matrixData[i])
         print(x)
 if __name__=="__main__":
-    # path='../experiment'
-    # for i in os.listdir(path):
-    #     if i.endswith('json'):
-    #         result=readJson(os.path.join(path,i))
-    #         print(i)
-    #         analysis(result)
-    dataPath='../experiment\publicData'
-    analysisMeanMain(dataPath,dataPath)
 
-    # logger.warning(x)
+    dataPath=r'E:\labCode\autoencoders4imputation\experiment\publicData'
+    savePath=r'C:\Users\pro\Desktop\自编码器部分实验\原始全数据全方法'
+    analysisMeanMain(dataPath,savePath)
+
 

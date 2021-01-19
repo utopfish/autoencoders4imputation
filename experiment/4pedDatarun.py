@@ -21,7 +21,7 @@ from baseline.SOTABaselineMICE import  imputeMethodMICE as MICE
 from baseline.SOTABaselineRandom import  imputeMethodRandom as Random
 from baseline.SOTABaselineEM import  imputeMethodEM as EM
 from baseline.SOTABaselineMedian import  imputeMethodMedain as Medain
-from baseline.myMethodTest import imputeMethod as TAI
+from baseline.myMethod import imputeMethod as TAI
 
 from utils.handle_missingdata import gene_missingdata, gene_missingdata_taxa_bias, gene_missingdata_chara_bias, \
     gene_missingdata_block_bias

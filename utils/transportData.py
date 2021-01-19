@@ -7,6 +7,7 @@ __author__ = "liuAmon"
 对数据格式进行转换
 '''
 import os
+import re
 from collections import Counter
 from utils.read_file import readNex
 def count(str):
@@ -38,8 +39,62 @@ def readTre2mouse(path,speciesName,savePath):
             i=i.replace(')(','),(')
             # count(i)
             for j in range(len(speciesName)-1,-1,-1):
-
                 i = i.replace('{}'.format(j), '{}'.format(speciesName[j]))
+            print(i)
+            res.append(i)
+    with open(savePath,'w') as f:
+        for i in res:
+            f.writelines(i+"\n")
+def replace_char(old_string, char, index,old_len):
+    '''
+    字符串按索引位置替换字符
+    '''
+    old_string = str(old_string)
+    # 新的字符串 = 老字符串[:要替换的索引位置] + 替换成的目标字符 + 老字符串[要替换的索引位置+1:]
+    new_string = old_string[:index] + char + old_string[index+old_len:]
+    return new_string
+def hasP(index,i):
+    """
+    判断当前位置字符一直往做，是否会遇到P
+    :param index:
+    :param i:
+    :return:
+    """
+    while (index>=0):
+        if i[index]=="p":
+            return False
+        elif i[index]=="(":
+            return True
+        elif i[index]==",":
+            return True
+        index-=1
+    return True
+def simTre2mouse(path,speciesName,savePath):
+    '''
+    将模拟数据从tnt格式转换为treespace能阅读模式
+    :param path:
+    :param speciesName:
+    :param savePath:
+    :return:
+    '''
+    res=[]
+    with open(path, "r") as f:  # 打开文件
+        data = f.read()
+        for i in data.split('\n')[1:-1]:
+            if 'proc-' in i:
+                break
+            i = i.replace(' )', ')')
+            i= i.replace(' ',',')
+            i= i.replace('*',';')
+            i=i.replace(')(','),(')
+            # count(i)
+            for j in range(len(speciesName) - 1, -1, -1):
+                t=[loc.start() for loc in re.finditer(str(j), i)]
+                for index in [loc.start() for loc in re.finditer(str(j), i)]:
+                    if  hasP(index,i):
+                        i=replace_char(i,'{}'.format(speciesName[j]),index,len(str(j)))
+                        break
+                #i = i.replace('{}'.format(j), '{}'.format(speciesName[j]),1)
             print(i)
             res.append(i)
     with open(savePath,'w') as f:
@@ -140,10 +195,12 @@ if __name__=="__main__":
     #readTreeSpecies(treeSpecies,speciesName)
     # count = Counter("(Bombylius_major,((Apsilocephala_longistyla,(Prorates_sp_Escalante,(Phycus_frommeri,Hemigephyra_atra))),((Apiocera_painteri,((Opomydas_townsendi,Mydas_clavatus),(Mitrodetus_dentitarsis,(Nemomydas_brachyrhynchus,Afroleptomydas_sp_Clanwilliam)))),((Rhipidocephala_sp_HaroldJohnson,(Holcocephala_calva,Holcocephala_abdominalis)),((Perasis_transvaalensis,(Laphystia_tolandi,(Trichardis_effrena,(Nusa_infumata,((Laxenecera_albicincta,Hoplistomerus_nobilis),((Pilica_formidolosa,(Cerotainia_albipilosa,Atomosia_puella)),((Stiphrolamyra_angularis,Lamyra_gulo),(Laphria_aktis,Choerades_bella)))))))),((((Damalis_monochaetes,Damalis_annulata),(Rhabdogaster_pedion,Acnephalum_cylindricum)),(((Pegesimallus_laticornis,(Diogmites_grossus,(Plesiomma_sp_Guanacaste,(Dasypogon_diadema,(Saropogon_luteus,Lestomyia_fraudiger))))),((Trichoura_sp_Tierberg,Ablautus_coquilletti),(Molobratia_teutonus,(Nicocles_politus,(Leptarthrus_brevirostris,(Cyrtopogon_rattus,Ceraturgus_fasciatus)))))),((Willistonina_bilineata,(Eudioctria_albius,(Dioctria_hyalipennis,(Dioctria_rufipes,Dioctria_atricapillus)))),((Gonioscelis_ventralis,(Stenopogon_rufibarbis,Ospriocerus_aeacus)),((Tillobroma_punctipennis,(Prolepsis_tristis,Microstylum_sp_Karkloof)),(Lycostommyia_albifacies,(Scylaticus_costalis,Connomyia_varipennis))))))),(((Lasiopogon_cinctus,Lasiopogon_aldrichii),(Stichopogon_punctum,(Stichopogon_trifasciatus,Stichopogon_elegantulus))),(((Euscelidia_pulchra,Beameromyia_bifida),((Leptogaster_cylindrica,Leptogaster_arida),(Tipulogaster_glabrata,Lasiocnemus_lugens))),(((Emphysomera_pallidapex,Emphysomera_conopsoides),(Ommatius_tibialis,Afroestricus_chiastoneurus)),((Proctacanthus_philadelphicus,Pogonioefferia_pogonias),((Philodicus_tenuipes,(Promachus_amastrus,Megaphorus_pulchrus)),((Neolophonotus_bimaculatus,Dasophrys_crenulatus),(Neoitamus_cyanurus,(Clephydroneura_sp_Kepong,(Dysmachus_trigonus,(Philonicus_albiceps,(Machimus_occidentalis,(Tolmerus_atricapillus,(Asilus_sericeus,Asilus_crabroniformis)))))))))))))))))))")
     # print(count)
-    originFilePath=r'C:\Users\pro\Desktop\imptuedData2RF\01\01_Aguado2009.nex'
+    #nex文件路径
+    originFilePath=r'C:\Users\pro\Desktop\ConstructTreeProject\sim.nex'
 
-    treFilePath=r'C:\Users\pro\Desktop\Aguado2009_200树\原始数据\0.5_03_Dikow2009_tnt.tre'
-    treeSpaceFile=r'C:\Users\pro\Desktop\Aguado2009_200树\0.5_01_Aguado2009_tnt.txt'
+    #tnt建树结果路径
+    treFilePath=r'C:\Users\pro\Desktop\大论文实验1\simData.tre'
+    treeSpaceFile=r'C:\Users\pro\Desktop\大论文实验1\simData.tnt'
 
     originData, miss_mask, speciesName, begin, end = readNex(originFilePath)
-    readTre2mouse(treFilePath, speciesName, treeSpaceFile)
+    simTre2mouse(treFilePath, speciesName, treeSpaceFile)

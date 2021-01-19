@@ -22,7 +22,7 @@ from baseline.SOTABaselineEM import  imputeMethodEM as EM
 from baseline.SOTABaselineMICE import  imputeMethodMICE as MICE
 from baseline.SOTABaselineRandom import  imputeMethodRandom as Random
 from baseline.SOTABaselineRF import imputeMethodMR as MR
-from baseline.myMethodTest import imputeMethod as TAI
+from baseline.myMethod import imputeMethod as TAI
 
 from utils.tools import saveJson
 from utils.read_file import readAllTypeFile
@@ -70,9 +70,9 @@ def mainWork(path,savePath):
                             firstImputedData=KNNImputedData
                         for loss in ['MSELoss']:
                             #for autoMethod in ['Autoencoder','ResAutoencoder','StockedAutoencoder','StockedResAutoencoder']:
-                            for autoMethod in ['Autoencoder']:
+                            for autoMethod in ['StockedResAutoencoder']:
                                 start=time.time()
-                                result=TAI(result=result,firstImputedMethod=firstImputedMethod,
+                                result,_=TAI(result=result,firstImputedMethod=firstImputedMethod,
                                                     firstImputedData=firstImputedData,
                                                     loss=loss,autoMethod=autoMethod,
                                                     originData=originData,missData=missData,
@@ -83,7 +83,7 @@ def mainWork(path,savePath):
 
 if __name__=="__main__":
     path = r'../public_data'
-    savePath=r'../experiment/addRM'
+    savePath=r'E:\labCode\autoencoders4imputation\experiment\加大自编码器参数'
     for _ in range(5):
         mainWork(path,savePath)
 

@@ -17,7 +17,6 @@ from utils.tools import addResult,plotResult
 from utils.handle_missingdata import gene_missingdata, gene_missingdata_taxa_bias, gene_missingdata_chara_bias, \
     gene_missingdata_block_bias
 from utils.base_tools import modifier
-from utils.base_impute import random_inpute
 import impyute
 from utils.read_file import readNex
 from utils.wapper import costTime
