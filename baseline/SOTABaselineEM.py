@@ -43,29 +43,3 @@ def imputeMethodEM(result,originData,missData,missRate,missPattern,dataType='con
     return result,imputedData
 
 
-
-if __name__=="__main__":
-    file = r'../public_data/1_Iris.xlsx'
-    resultPath=r'../result'
-    data = pd.read_excel(file, sheet_name="dataset")
-    dt = np.array(data.values)
-    data = dt.astype('float')
-    originData = data[:-1]
-    target = data[-1]
-    result = {}
-    for missPattern in ['normal']:
-        for missRate in [0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
-            if missPattern == 'normal':
-                missData = gene_missingdata(rate=missRate, data=originData)
-            elif missPattern == 'taxa':
-                missData = gene_missingdata_taxa_bias(rate=missRate, data=originData)
-            elif missPattern == 'chara':
-                missData = gene_missingdata_chara_bias(rate=missRate, data=originData)
-            elif missPattern == 'block':
-                missData = gene_missingdata_block_bias(rate=missRate, data=originData)
-            else:
-                raise Exception("缺失模式错误，请在'normal','taxa','chara','block'中选择对应模式")
-
-            result=imputeMethod(result, originData, missData, missRate, missPattern)
-    saveJson(result,"{}_{}_{}.json".format("EM","iris",datetime.datetime.now().strftime('%Y%m%d-%H%M%S')))
-    plotResult(result)

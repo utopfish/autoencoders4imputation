@@ -90,6 +90,45 @@ def getMeanAndStd(data):
     return mean,std
 
 
+def analysisMeanMain2(dataPath,savePath):
+    """
+    单一标注，只记录基础MICE-修改方法,不记录MICE
+    :param dataPath:
+    :param savePath:
+    :return:
+    """
+    for missRate in [0.05, 0.1, 0.2, 0.3, 0.4, 0.5]:
+        for i in os.listdir(dataPath):
+            if i.endswith('json'):
+                result=readJson(os.path.join(dataPath,i))
+                analysisMean("_".join(i.split('_')[:4]),result)
+        x = PrettyTable(['dataSet','Method', 'pattern', 'missRate', 'RMSE', 'MAE', "MAPE"])
+        matrixData=[[] for _ in range(3)]
+        methodName=[i.split(":")[1] for i in result.keys()]
+        for i in range(3):
+            matrixData[i].append(['{}'.format(missRate)]+methodName)
+        for datasetResult in totalResult:
+            matrixDataTmp=[[datasetResult.split("_")[3]] for _ in range(3)]
+            for missPatternMethodRate in totalResult[datasetResult]:
+                missDataImputedMisc = np.array(totalResult[datasetResult][missPatternMethodRate])
+                if float(missPatternMethodRate.split(":")[2])==missRate:
+                    # if  'MSELoss' not in missPatternMethodRate.split(":")[1] or \
+                    #         'mice_MSELoss_Autoencoder' == missPatternMethodRate.split(":")[1] :
+                        #if "MICE"!=missPatternMethodRate.split(":")[1] :
+                            tmp = []
+                            for i in range(3):
+                                M, S = getMeanAndStd(missDataImputedMisc[:, i])
+                                tmp.append("{:.2f}".format(M, S))
+                                matrixDataTmp[i].append("{:.2f}".format(M, S))
+                            x.add_row([datasetResult]+missPatternMethodRate.split(":")  + tmp)
+            for i in range(3):
+                matrixData[i].append(matrixDataTmp[i])
+        if not os.path.exists(savePath):
+            os.makedirs(savePath)
+        for i,loss in enumerate(['MSE','MAP','MAPE']):
+            write_excel_xls(os.path.join(savePath,"{}.xls".format(loss)),"data",matrixData[i])
+        print(x)
+
 def analysisMeanMain(dataPath,savePath):
     for missRate in [0.05, 0.1, 0.2, 0.3, 0.4, 0.5]:
         for i in os.listdir(dataPath):
@@ -106,8 +145,8 @@ def analysisMeanMain(dataPath,savePath):
             for missPatternMethodRate in totalResult[datasetResult]:
                 missDataImputedMisc = np.array(totalResult[datasetResult][missPatternMethodRate])
                 if float(missPatternMethodRate.split(":")[2])==missRate:
-                    if  'MSELoss' not in missPatternMethodRate.split(":")[1] or \
-                            'mice_MSELoss_Autoencoder' == missPatternMethodRate.split(":")[1] :
+                    # if  'MSELoss' not in missPatternMethodRate.split(":")[1] or \
+                    #         'mice_MSELoss_Autoencoder' == missPatternMethodRate.split(":")[1] :
                         tmp = []
                         for i in range(3):
                             M, S = getMeanAndStd(missDataImputedMisc[:, i])
@@ -121,8 +160,6 @@ def analysisMeanMain(dataPath,savePath):
         for i,loss in enumerate(['MSE','MAP','MAPE']):
             write_excel_xls(os.path.join(savePath,"{}.xls".format(loss)),"data",matrixData[i])
         print(x)
-
-
 def json2Excel(filePath,ExcelPath):
     """
     将Json文件转为Excel文件

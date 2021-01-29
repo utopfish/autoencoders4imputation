@@ -10,7 +10,6 @@ import numpy as np
 import pandas as pd
 from utils.misc_utils import RMSE, MAE, masked_mape_np
 
-
 from dnn.tai_test import TAI
 from utils.tools import addResult,plotResult
 from ycimpute.utils import evaluate
@@ -25,7 +24,7 @@ def imputeMethod(result,loss,firstImputedMethod,autoMethod,originData,missData,m
                                                batch_size=len(missData),
                                                epochs=500,
                                                theta=int(len(missData[0]) / 3),
-                                               iterations=100,
+                                               iterations=1000,
                                                Autoencoder_method=autoMethod,
                                                loss=loss,
                                                use_cuda=False

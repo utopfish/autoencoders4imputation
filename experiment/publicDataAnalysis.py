@@ -8,6 +8,16 @@
 """
 from utils.dataAnalysis import analysisMeanMain,analysisPlot
 if __name__=="__main__":
-    dataPath = r'C:\Users\pro\Desktop\实验相关文档\缺失插补建树全流程\04缺失插补结果'
-    # analysisMeanMain(dataPath, dataPath)
-    analysisPlot(dataPath, dataPath)
+    # dataPath = r'C:\Users\pro\Desktop\autoencoders4imputation\experiment\加大自编码器参数'
+    # savePath = r'C:\Users\pro\Desktop\实验二自编码器建树\UCI数据集测试\加大自编码器参数'
+    # analysisMeanMain(dataPath, savePath)
+
+
+    # dataPath = r'C:\Users\pro\Desktop\autoencoders4imputation\experiment\publicData'
+    # savePath = r'C:\Users\pro\Desktop\实验二自编码器建树\UCI数据集测试\原始全数据全方法'
+    # analysisMeanMain(dataPath, savePath)
+
+
+    dataPath = r'C:\Users\pro\Desktop\autoencoders4imputation\experiment\加大自编码器参数-mice'
+    savePath = r'C:\Users\pro\Desktop\实验二自编码器建树\UCI数据集测试\加大参数后自编码器与MICE单独比较'
+    analysisMeanMain(dataPath, savePath)

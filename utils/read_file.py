@@ -19,7 +19,6 @@ def readNex(path):
     speciesname=[]
     with open(path, "r") as f:  # 打开文件
         flag = 0
-        # data =
         split_data=f.read().split('\n')# 读取文件
         begin = []
         end = []
@@ -28,7 +27,7 @@ def readNex(path):
                 flag = 1
                 begin.append(i)
                 continue
-            elif ';' == i:
+            elif ';' == i.replace(" ",""):
                 flag = 2
                 end.append(i)
                 continue
@@ -58,9 +57,28 @@ def readNex(path):
     return np.array(data,dtype=float),misss_row,speciesname,begin,end
 
 
-
+def saveNex(fileSavePath,speciesName,data,begin,end):
+    with  open(fileSavePath, 'w') as f:
+        temp = list(data)
+        for i in begin:
+            f.writelines(i+'\n')
+        for i in range(len(temp)):
+            dataTemp=[]
+            for j in range(len(temp[i])):
+                try:
+                    dataTemp.append(str(int(temp[i][j])))
+                    if dataTemp[-1]=='-1':
+                        dataTemp[-1]='-'
+                except:
+                    dataTemp.append('?')
+            temp[i] = speciesName[i] + ' ' + ''.join(dataTemp)
+            f.writelines(temp[i] + '\n')
+        for i in end:
+            f.writelines(i+'\n')
 
 def saveData(fileSavePath,fileName,speciesName,data,begin,end):
+    if not os.path.exists(fileSavePath):
+        os.makedirs(fileSavePath)
     with  open(os.path.join(fileSavePath, fileName), 'w') as f:
         temp = list(data)
         for i in begin:
@@ -74,7 +92,6 @@ def saveData(fileSavePath,fileName,speciesName,data,begin,end):
                         dataTemp[-1]='-'
                 except:
                     dataTemp.append('?')
-            # temp[i] = ['-' if  str(int(x)) for x in temp[i]]
             temp[i] = speciesName[i] + ' ' + ''.join(dataTemp)
             f.writelines(temp[i] + '\n')
         for i in end:
@@ -237,7 +254,7 @@ def lableEncoder(data):
     :return:
     """
 
-    df = pd.DataFrame(data)
+    df = pd.DataFrame(data,dtype=int)
     from sklearn.preprocessing import LabelEncoder
     for col in list(df):
         le = LabelEncoder()

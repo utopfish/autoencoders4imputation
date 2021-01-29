@@ -3,10 +3,11 @@
 #@e-mail:utopfish@163.com
 #@File:handle_missingdata.py
 __author__ = "skux liu"
+import re
 import random
 import numpy as np
 import pandas as pd
-
+from utils.read_file import readNex,saveNex
 def hasNan(li):
     for i in li:
         if np.isnan(i):
@@ -145,3 +146,45 @@ def check_missrate(data):
                 missCount += 1
     missRate = missCount / (len(data) * len(data[0]))
     return missRate
+
+import heapq
+def deleteCharaterBymissRate(originPath,savePath,rate):
+    """
+    按照缺失率删除特征，特征缺失超过rate进行删除
+    :param originPath: 文件原始路径
+    :param savePath: 保存路径
+    :param rate: 缺失阈值
+    :return:
+    """
+    originData, missRow, speciesName, begin, end = readNex(originPath)
+    threshould=int(len(originData[0])*rate)
+    missNumber=[]
+    for j in range(len(originData[0])):
+        count=0
+        for i in range(len(originData)):
+            if np.isnan(originData[i][j]):
+               count+=1
+        missNumber.append((count,j))
+    ret=heapq.nlargest(threshould,missNumber,key=lambda x:x[0])
+    deletRow = [i[1] for i in ret]
+    deletRow.sort()
+    for index in range(len(begin)):
+        pattern="nchar *= *{}".format(str(len(originData[0])))
+        substring="nchar = {}".format(str(len(originData[0])-len(deletRow)))
+        begin[index]=re.sub(pattern,substring,begin[index])
+    for j in deletRow[::-1]:
+        originData=np.delete(originData,j,1)
+
+    saveNex(savePath,speciesName, originData, begin, end)
+
+if __name__=="__main__":
+    originPat=r"C:\Users\pro\Desktop\实验一缺失模式对建设的影响研究\缺失数据文件"
+    path=r'C:\Users\pro\Desktop\实验一缺失模式对建设的影响研究\缺失数据文件\0.75_normal_50taxa100chara_sim.tnt'
+    for i in [0.1,0.2,0.3,0.4,0.5,0.6,0.7]:
+        savePath=r'C:\Users\pro\Desktop\实验一缺失模式对建设的影响研究\dirty\0.75_normal_50taxa100chara_sim_{}.tnt'.format(i)
+        deleteCharaterBymissRate(path,savePath,i)
+    # i="nchar = 50; "
+    # t = re.sub("nchar *= *{}".format(str(50)),
+    #            "nchar = {}".format(str(4)),
+    #            i)
+    # print(t)

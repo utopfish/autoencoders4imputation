@@ -22,7 +22,6 @@ from baseline.SOTABaselineMIDA import  imputeMethodMIDA as MIDA
 from baseline.SOTABaselineEM import  imputeMethodEM as EM
 from baseline.SOTABaselineMICE import  imputeMethodMICE as MICE
 from baseline.SOTABaselineRandom import  imputeMethodRandom as Random
-
 from baseline.myMethod import imputeMethod as TAI
 
 from utils.tools import saveJson

@@ -18,7 +18,7 @@ from utils.handle_missingdata import gene_missingdata, gene_missingdata_taxa_bia
     gene_missingdata_block_bias
 from utils.base_tools import modifier
 import impyute
-from utils.read_file import readNex
+from utils.read_file import readNex,lableEncoder
 from utils.wapper import costTime
 
 @costTime
@@ -48,32 +48,19 @@ def imputeMethodMICE(result,originData,missData,missRate,missPattern,dataType='c
 
 
 if __name__=="__main__":
-    path = r'../nexus_files'
-    for file in os.listdir(path):
-        try:
-            data, misss_row, speciesname, begin, end = readNex(os.path.join(path, file))
-            data = data + 10
-        except ValueError:
-            print("可能存在数据多态问题")
-            #shear_dile(os.path.join(path, file), os.path.join("G:\labWork\cladistic-data-master\可能无用数据"))
-            print("文件移动成功")
-            continue
-        originData =  impyute.imputation.cs.random(data)
-        result = {}
-        for missPattern in ['normal']:
-            for missRate in [0.05]:
-                if missPattern == 'normal':
-                    missData = gene_missingdata(rate=missRate, data=originData)
-                elif missPattern == 'taxa':
-                    missData = gene_missingdata_taxa_bias(rate=missRate, data=originData)
-                elif missPattern == 'chara':
-                    missData = gene_missingdata_chara_bias(rate=missRate, data=originData)
-                elif missPattern == 'block':
-                    missData = gene_missingdata_block_bias(rate=missRate, data=originData)
-                else:
-                    raise Exception("缺失模式错误，请在'normal','taxa','chara','block'中选择对应模式")
+    dataPath = r'C:\Users\pro\Desktop\实验二自编码器建树\古生物数据集测试\01起始数据集\01_Yang2015.nex'
 
-                result=imputeMethodMICE(result, originData, missData, missRate, missPattern,'disperse')
-                break
-
-        plotResult(result)
+    missData, missRow, speciesName, begin, end = readNex(dataPath)
+    #missData = lableEncoder(originData)
+    result={}
+    missRate=0.3
+    missPattern="normal"
+    print(missData)
+    s=set()
+    for i in range(len(missData)):
+        for j in range(len(missData[0])):
+            s.add(missData[i][j])
+    print(s)
+    print(np.isnan(missData).any())
+    print(np.isfinite(missData).all())
+    t=mice.MICE().complete(missData)
