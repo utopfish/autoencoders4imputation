@@ -1,5 +1,5 @@
 xlrd
-numpy==1.16.0
+numpy==1.22.0
 pandas
 pytest
 Ipython
